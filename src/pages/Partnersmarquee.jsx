@@ -1,4 +1,4 @@
-import "./PartnersMarquee.css";
+import "./Partnersmarquee.css";
 
 // TEMPORARY placeholder names — replace with real partner logos (as <img> tags)
 // once you have them. Keep the list length even for a smooth seamless loop.
