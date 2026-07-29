@@ -1,0 +1,375 @@
+/*==================================================
+  PROPERTIES SECTION
+==================================================*/
+
+.rk-prop {
+  background: #f7f4ef;
+  padding: 40px 24px;
+}
+
+.rk-prop__inner {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/*========================
+ Header
+========================*/
+
+.rk-prop__head {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.rk-prop__heading {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  font-weight: 700;
+  color: #1f1f1f;
+  line-height: 1.05;
+  margin-bottom: 18px;
+}
+
+.rk-prop__desc {
+  max-width: 650px;
+  margin: auto;
+  color: #777;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.rk-prop__head-side{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:24px;
+}
+
+.rk-prop__tags{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.rk-prop__tag{
+    padding:10px 22px;
+    border-radius:999px;
+    background:#fff;
+    border:1px solid #e6e6e6;
+    font-size:.82rem;
+    font-weight:600;
+    transition:.3s;
+    cursor:pointer;
+}
+
+.rk-prop__tag:hover{
+    background:#111;
+    color:#fff;
+}
+
+.rk-prop__cta{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 30px;
+    background:#111;
+    color:#fff;
+    border-radius:999px;
+    text-decoration:none;
+    font-weight:600;
+    transition:.35s;
+}
+
+.rk-prop__cta:hover{
+    background:#c8a05a;
+    color:#111;
+}
+
+/*========================
+ GRID
+========================*/
+
+.rk-prop__rows{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:28px;
+}
+
+@media(max-width:1024px){
+
+.rk-prop__rows{
+grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+@media(max-width:700px){
+
+.rk-prop__rows{
+grid-template-columns:1fr;
+}
+
+}
+
+/* hide old layout */
+
+.rk-prop__triorow{
+display:contents;
+}
+
+
+/*==================================================
+  PROPERTY CARD
+==================================================*/
+
+.rk-ptile{
+    display:block;
+    background:#fff;
+    border-radius:22px;
+    overflow:hidden;
+    text-decoration:none;
+    color:inherit;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.08);
+
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease;
+}
+
+.rk-ptile:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:
+        0 28px 60px rgba(0,0,0,.16);
+}
+
+/*========================
+IMAGE
+========================*/
+
+.rk-ptile__media{
+
+    position:relative;
+
+    height:240px;
+
+    overflow:hidden;
+}
+
+.rk-ptile__media::after{
+
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:linear-gradient(
+        to top,
+        rgba(0,0,0,.28),
+        transparent 55%
+    );
+
+    pointer-events:none;
+}
+
+.rk-ptile__media img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    transition:
+        transform .6s ease;
+}
+
+.rk-ptile:hover img{
+
+    transform:scale(1.08);
+}
+
+/* Remove old aspect ratios */
+
+.rk-ptile--wide .rk-ptile__media,
+.rk-ptile--large .rk-ptile__media,
+.rk-ptile--half .rk-ptile__media{
+
+    aspect-ratio:auto;
+    height:240px;
+}
+
+/*========================
+CONTENT
+========================*/
+
+.rk-ptile__caption{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+
+    gap:18px;
+
+    padding:22px;
+}
+
+.rk-ptile__caption h4{
+
+    margin:0 0 10px;
+
+    font-size:1.18rem;
+
+    font-weight:700;
+
+    color:#202020;
+
+    transition:.3s;
+}
+
+.rk-ptile:hover h4{
+
+    color:#c89b3c;
+}
+
+.rk-ptile__caption span{
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    color:#777;
+
+    font-size:.92rem;
+}
+
+.rk-ptile__caption strong{
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    background:#111;
+
+    color:#fff;
+
+    font-size:.92rem;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+    transition:.3s;
+}
+
+.rk-ptile:hover strong{
+
+    background:#c89b3c;
+
+    color:#111;
+}
+
+/*========================
+BADGE
+========================*/
+
+.rk-ptile__media::before{
+
+    content:"Verified";
+
+    position:absolute;
+
+    left:18px;
+    top:18px;
+
+    z-index:2;
+
+    padding:7px 14px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.95);
+
+    backdrop-filter:blur(10px);
+
+    font-size:.72rem;
+
+    font-weight:700;
+
+    color:#111;
+}
+
+/*========================
+HEART ICON
+========================*/
+
+.rk-ptile__media .heart{
+
+    position:absolute;
+
+    right:18px;
+    top:18px;
+
+    width:42px;
+    height:42px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.92);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:18px;
+
+    transition:.35s;
+}
+
+.rk-ptile:hover .heart{
+
+    background:#c89b3c;
+
+    color:#fff;
+}
+
+/*========================
+RESPONSIVE
+========================*/
+
+@media(max-width:900px){
+
+.rk-ptile__media{
+
+height:220px;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.rk-ptile__media{
+
+height:200px;
+
+}
+
+.rk-ptile__caption{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+.rk-ptile__caption strong{
+
+margin-top:10px;
+
+}
+
+}

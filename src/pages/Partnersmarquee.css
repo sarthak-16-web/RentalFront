@@ -1,0 +1,78 @@
+.rk-partners {
+  background: var(--color-navy-950);
+  padding: 32px 0 36px;
+  overflow: hidden;
+}
+
+.rk-partners__label {
+  text-align: center;
+  margin: 0 24px 22px;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.rk-partners__viewport {
+  overflow: hidden;
+  width: 100%;
+  /* soft fade at both edges so the loop doesn't look like a hard cut */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+.rk-partners__track {
+  display: flex;
+  width: max-content;
+  animation: rk-marquee 28s linear infinite;
+}
+
+.rk-partners__track:hover {
+  animation-play-state: paused;
+}
+
+.rk-partners__item {
+  flex-shrink: 0;
+  padding: 0 40px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.rk-partners__item:hover {
+  color: var(--color-gold-400);
+}
+
+@keyframes rk-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-partners__track {
+    animation: none;
+  }
+  .rk-partners__viewport {
+    overflow-x: auto;
+  }
+}

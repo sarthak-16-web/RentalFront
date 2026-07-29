@@ -1,0 +1,147 @@
+.rk-team {
+  background: var(--color-navy-950);
+  padding: 20px 24px 25px;
+}
+
+.rk-team__inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.rk-team__eyebrow {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-gold-400);
+}
+
+.rk-team__heading {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+  color: var(--color-white);
+  margin: 0 0 16px;
+}
+
+.rk-team__heading em {
+  color: var(--color-gold-400);
+  font-style: italic;
+}
+
+.rk-team__rule {
+  display: block;
+  width: 64px;
+  height: 2px;
+  background: var(--color-gold-500);
+  margin: 0 auto 48px;
+}
+
+.rk-team__grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(6, 1fr);
+  justify-items: center;
+  margin-bottom: 40px;
+}
+
+.rk-team__grid .rk-reveal {
+  width: 100%;
+  max-width: 190px;
+  height: 100%;
+}
+
+@media (max-width: 900px) {
+  .rk-team__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .rk-team__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rk-team__grid .rk-reveal {
+    max-width: none;
+  }
+}
+
+.rk-team__card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-align: left;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rk-team__card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(207, 154, 63, 0.4);
+}
+
+.rk-team__photo {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.rk-team__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rk-team__body {
+  padding: 12px 14px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rk-team__body h4 {
+  margin: 0 0 3px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.rk-team__role {
+  margin: 0 0 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-gold-400);
+}
+
+.rk-team__blurb {
+  margin: 0;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rk-team__viewall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--color-gold-500);
+  color: var(--color-gold-400);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 13px 30px;
+  border-radius: var(--radius-md);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rk-team__viewall:hover {
+  background: var(--color-gold-500);
+  color: var(--color-navy-950);
+}
