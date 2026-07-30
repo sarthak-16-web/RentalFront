@@ -1,4 +1,174 @@
 /*==================================================
+  HERO
+==================================================*/
+
+.rk-hero{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-end;
+    overflow:hidden;
+    background:#111;
+}
+
+.rk-hero__img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 70%;
+}
+
+.rk-hero__scrim{
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(to top, rgba(10,10,10,.92) 0%, rgba(10,10,10,.55) 42%, rgba(10,10,10,.15) 70%, rgba(10,10,10,.35) 100%);
+}
+
+.rk-hero__inner{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:1320px;
+    margin:0 auto;
+    padding:0 24px 90px;
+    color:#fff;
+}
+
+.rk-hero__eyebrow{
+    display:inline-block;
+    padding:8px 18px;
+    margin-bottom:22px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.35);
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(6px);
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#f0d9a8;
+}
+
+.rk-hero__heading{
+    font-family:var(--font-display);
+    font-size:clamp(2.6rem, 6.2vw, 5rem);
+    font-weight:700;
+    line-height:1.05;
+    margin:0 0 22px;
+    max-width:14ch;
+}
+
+.rk-hero__desc{
+    max-width:480px;
+    font-size:1.05rem;
+    line-height:1.75;
+    color:rgba(255,255,255,.78);
+    margin-bottom:36px;
+}
+
+.rk-hero__actions{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:16px;
+    margin-bottom:36px;
+}
+
+.rk-hero__cta-ghost{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 28px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.5);
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+    transition:.3s;
+}
+
+.rk-hero__cta-ghost:hover{
+    background:#fff;
+    color:#111;
+    border-color:#fff;
+}
+
+.rk-hero__tags{
+    justify-content:flex-start;
+}
+
+.rk-hero__tags .rk-prop__tag{
+    background:rgba(255,255,255,.1);
+    border-color:rgba(255,255,255,.3);
+    color:#fff;
+}
+
+.rk-hero__tags .rk-prop__tag:hover{
+    background:#c89b3c;
+    color:#111;
+    border-color:#c89b3c;
+}
+
+.rk-hero__tags .rk-prop__tag.is-active{
+    background:#c89b3c;
+    border-color:#c89b3c;
+    color:#111;
+}
+
+.rk-hero__scrollcue{
+    position:absolute;
+    left:50%;
+    bottom:28px;
+    transform:translateX(-50%);
+    z-index:2;
+    width:26px;
+    height:42px;
+    border:2px solid rgba(255,255,255,.5);
+    border-radius:999px;
+}
+
+.rk-hero__scrollcue span{
+    position:absolute;
+    top:8px;
+    left:50%;
+    width:4px;
+    height:8px;
+    margin-left:-2px;
+    border-radius:999px;
+    background:#fff;
+    animation:rk-scroll-cue 1.8s ease infinite;
+}
+
+@keyframes rk-scroll-cue{
+    0%{ transform:translateY(0); opacity:1; }
+    70%{ transform:translateY(14px); opacity:0; }
+    100%{ transform:translateY(0); opacity:0; }
+}
+
+@media(max-width:700px){
+
+.rk-hero{
+    align-items:flex-end;
+}
+
+.rk-hero__inner{
+    padding-bottom:60px;
+}
+
+.rk-hero__heading{
+    max-width:none;
+}
+
+.rk-hero__scrollcue{
+    display:none;
+}
+
+}
+
+/*==================================================
   PROPERTIES SECTION
 ==================================================*/
 
@@ -112,10 +282,25 @@ grid-template-columns:1fr;
 
 }
 
-/* hide old layout */
+/*========================
+ VIEW MORE
+========================*/
 
-.rk-prop__triorow{
-display:contents;
+.rk-prop__more{
+    display:flex;
+    justify-content:center;
+    margin-top:52px;
+}
+
+.rk-prop__more-btn{
+    border-color:#111;
+    color:#111;
+}
+
+.rk-prop__more-btn:hover{
+    background:#111;
+    color:#fff;
+    border-color:#111;
 }
 
 

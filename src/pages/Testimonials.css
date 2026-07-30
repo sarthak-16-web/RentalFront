@@ -1,0 +1,126 @@
+.rk-treviews__header {
+  background: linear-gradient(155deg, var(--color-navy-950) 0%, var(--color-navy-800) 100%);
+  padding: 56px 24px;
+}
+
+.rk-treviews__header-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.rk-treviews__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-gold-400);
+}
+
+.rk-treviews__header h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+  color: var(--color-white);
+  margin: 0 0 10px;
+}
+
+.rk-treviews__sub {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.rk-treviews__body {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 40px 24px 90px;
+}
+
+.rk-treviews__grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: 1fr;
+}
+
+.rk-treviews__grid .rk-reveal {
+  height: 100%;
+}
+
+@media (min-width: 640px) {
+  .rk-treviews__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 980px) {
+  .rk-treviews__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.rk-treview {
+  background: var(--color-white);
+  border: 1px solid var(--color-line-dark);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rk-treview:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-soft);
+}
+
+.rk-treview__stars {
+  display: flex;
+  gap: 3px;
+  color: var(--color-gold-500);
+  margin-bottom: 14px;
+}
+
+.rk-treview__text {
+  margin: 0 0 22px;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: var(--color-ink-900);
+  flex: 1;
+}
+
+.rk-treview__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-line-dark);
+}
+
+.rk-treview__avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-navy-950);
+  color: var(--color-gold-400);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.rk-treview__footer h5 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-ink-900);
+}
+
+.rk-treview__footer span {
+  font-size: 0.78rem;
+  color: var(--color-slate-500);
+}

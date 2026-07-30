@@ -1,4 +1,6 @@
+import { useMemo, useState } from "react";
 import Reveal from "../components/Reveal";
+ import heroBuilding from "/imagecopy.png";
 import "./PropertiesHome.css";
 
 const ArrowIcon = () => (
@@ -56,16 +58,16 @@ const MOCK_PROPERTIES = [
     location: "Sadar, Jabalpur",
     category: "House",
     coverImage: "https://picsum.photos/seed/rk-prop-5/1600/800",
-  }
+  },
 ];
 
-const CATEGORY_TAGS = ["Villa", "Apartment", "House", "Commercial"];
+const CATEGORY_TAGS = ["All", "Villa", "Apartment", "House", "Commercial"];
 
-const PropertyTile = ({ p, className = "" }) => (
-  <a href={`/properties/${p._id}`} className={`rk-ptile ${className}`}>
+const PropertyTile = ({ p }) => (
+  <a href={`/properties/${p._id}`} className="rk-ptile">
     <div className="rk-ptile__media">
-         <span className="heart">♡</span>
-      <img src={p.coverImage} alt={p.name} />
+      <span className="heart">♡</span>
+      <img src={p.coverImage} alt={p.name} loading="lazy" />
     </div>
     <div className="rk-ptile__caption">
       <div>
@@ -78,53 +80,108 @@ const PropertyTile = ({ p, className = "" }) => (
 );
 
 const PropertiesHome = () => {
-  const [p1, p2, p3, p4, p5] = MOCK_PROPERTIES;
+  const [activeTag, setActiveTag] = useState("All");
+
+  const visibleProperties = useMemo(() => {
+    if (activeTag === "All") return MOCK_PROPERTIES;
+    return MOCK_PROPERTIES.filter((p) => p.category === activeTag);
+  }, [activeTag]);
 
   return (
-    <section className="rk-prop">
-         <img
-    src="/luxury-house.png"
-    alt=""
-    className="rk-prop__bg"
-  />
-      <div className="rk-prop__inner">
-        <div className="rk-prop__head">
+    <>
+      {/* ================= HERO ================= */}
+      <section className="rk-hero" id="rk-hero">
+        <img
+          className="rk-hero__img"
+          src={heroBuilding}
+          alt="RK Estates flagship commercial tower at dusk"
+        />
+        <div className="rk-hero__scrim" />
+
+        <div className="rk-hero__inner">
           <Reveal direction="up">
-           
+            <span className="rk-hero__eyebrow">Jabalpur's Address of Choice</span>
           </Reveal>
 
           <Reveal direction="up" delay={80}>
-           
-          </Reveal>
-        </div>
-
-        <div className="rk-prop__rows">
-          <Reveal direction="up">
-            <PropertyTile p={p1} className="rk-ptile--wide" />
+            <h1 className="rk-hero__heading">
+              Live, Work &amp; Invest<br />Above The Ordinary
+            </h1>
           </Reveal>
 
-          <div className="rk-prop__triorow">
-            <Reveal direction="up" delay={90}>
-              <PropertyTile p={p2} className="rk-ptile--large" />
-            </Reveal>
-            <Reveal direction="up" delay={150}>
-              <PropertyTile p={p3} className="rk-ptile--half" />
-            </Reveal>
-            <Reveal direction="up" delay={210}>
-              <PropertyTile p={p4} className="rk-ptile--large" />
-            </Reveal>
-            {/* <Reveal direction="up" delay={230}>
-            <PropertyTile p={p6} className="rk-ptile--wide" />
-          </Reveal> */}
-          </div>
+          <Reveal direction="up" delay={140}>
+            <p className="rk-hero__desc">
+              Curated villas, apartments and commercial addresses across the
+              city — verified, vetted and ready to view.
+            </p>
+          </Reveal>
+
+          <Reveal direction="up" delay={200}>
+            <div className="rk-hero__actions">
+              <a href="/properties" className="rk-prop__cta">
+                Explore Properties <ArrowIcon />
+              </a>
+              <a href="/contact" className="rk-hero__cta-ghost">
+                Talk To An Advisor
+              </a>
+            </div>
+          </Reveal>
 
           <Reveal direction="up" delay={260}>
-            <PropertyTile p={p5} className="rk-ptile--wide" />
+            <div className="rk-prop__tags rk-hero__tags">
+              {CATEGORY_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={`rk-prop__tag${activeTag === tag ? " is-active" : ""}`}
+                  onClick={() => setActiveTag(tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
           </Reveal>
-          
         </div>
-      </div>
-    </section>
+
+        <div className="rk-hero__scrollcue" aria-hidden="true">
+          <span />
+        </div>
+      </section>
+
+      {/* ================= LISTINGS ================= */}
+      <section className="rk-prop" id="rk-listings">
+        <div className="rk-prop__inner">
+          <div className="rk-prop__head">
+            <Reveal direction="up">
+              <h2 className="rk-prop__heading">Featured Properties</h2>
+            </Reveal>
+
+            <Reveal direction="up" delay={80}>
+              <p className="rk-prop__desc">
+                A handpicked selection of homes and commercial spaces,
+                updated weekly. Tap any listing for the full tour.
+              </p>
+            </Reveal>
+          </div>
+
+          <div className="rk-prop__rows">
+            {visibleProperties.map((p, i) => (
+              <Reveal direction="up" delay={90 + i * 60} key={p._id}>
+                <PropertyTile p={p} />
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal direction="up" delay={120}>
+            <div className="rk-prop__more">
+              <a href="/properties" className="rk-hero__cta-ghost rk-prop__more-btn">
+                View All Properties <ArrowIcon />
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </>
   );
 };
 
