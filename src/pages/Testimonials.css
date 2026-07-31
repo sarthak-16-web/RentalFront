@@ -124,3 +124,308 @@
   font-size: 0.78rem;
   color: var(--color-slate-500);
 }
+/* Add this to your existing Testimonials.css — styles the new
+   "Write a Review" button on the All Testimonials page header. */
+
+.rk-treviews__writebtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  background: var(--color-navy-950);
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 13px 26px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+/* Add this to your existing Testimonials.css.
+   Puts the header text on the left and the "Write a Review" button
+   on the right, on the same row (desktop). Stacks on mobile. */
+/* Add all of this to your existing Testimonials.css. */
+
+/* Header row: text left, button right */
+.rk-treviews__header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.rk-treviews__header-text {
+  flex: 1;
+  min-width: 260px;
+}
+
+.rk-treviews__writebtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-white);
+  color: var(--color-navy-950);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 13px 26px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rk-treviews__writebtn:hover {
+  background: var(--color-gold-500);
+  color: var(--color-white);
+}
+
+@media (max-width: 640px) {
+  .rk-treviews__header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rk-treviews__writebtn {
+    margin-top: 8px;
+  }
+}
+
+/* ----- Write a Review form (opens on the testimonials page) ----- */
+
+.rk-rform__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: rk-fade-in 0.15s ease;
+}
+
+@keyframes rk-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rk-rform {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-soft);
+  animation: rk-slide-up 0.2s ease;
+}
+
+@keyframes rk-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rk-rform__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--color-cream-50);
+  color: var(--color-ink-900);
+  border-radius: 50%;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.rk-rform__close:hover {
+  background: var(--color-gold-500);
+  color: var(--color-white);
+}
+
+.rk-rform__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-gold-500);
+}
+
+.rk-rform__title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.6rem;
+  color: var(--color-ink-900);
+  margin: 0 0 24px;
+}
+
+.rk-rform__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rk-rform__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rk-rform__field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-ink-900);
+}
+
+.rk-rform__field input,
+.rk-rform__field textarea {
+  font: inherit;
+  border: 1px solid var(--color-line-dark);
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  color: var(--color-ink-900);
+  background: var(--color-cream-50);
+  resize: none;
+  transition: border-color 0.15s ease;
+}
+
+.rk-rform__field input:focus,
+.rk-rform__field textarea:focus {
+  outline: none;
+  border-color: var(--color-gold-500);
+}
+
+.rk-rform__rating {
+  display: flex;
+  gap: 6px;
+}
+
+.rk-rform__star {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-gold-500);
+  display: inline-flex;
+  transition: transform 0.1s ease;
+}
+
+.rk-rform__star:hover {
+  transform: scale(1.12);
+}
+
+.rk-rform__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #c0392b;
+}
+
+.rk-rform__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.rk-rform__cancel {
+  background: none;
+  border: 1px solid var(--color-line-dark);
+  color: var(--color-ink-900);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.rk-rform__cancel:hover {
+  background: var(--color-cream-50);
+}
+
+.rk-rform__submit {
+  background: var(--color-navy-950);
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.rk-rform__submit:hover:not(:disabled) {
+  background: var(--color-gold-500);
+}
+
+.rk-rform__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .rk-rform {
+    padding: 28px 20px;
+  }
+}
+.rk-treviews__header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.rk-treviews__header-text {
+  flex: 1;
+  min-width: 260px;
+}
+
+.rk-treviews__writebtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-white);
+  color: var(--color-navy-950);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 13px 26px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rk-treviews__writebtn:hover {
+  background: var(--color-gold-500);
+  color: var(--color-white);
+}
+
+@media (max-width: 640px) {
+  .rk-treviews__header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rk-treviews__writebtn {
+    margin-top: 8px;
+  }
+}
+
+.rk-treviews__writebtn:hover {
+  background: var(--color-gold-500);
+}

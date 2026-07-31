@@ -41,6 +41,13 @@ const CloseIcon = () => (
   </svg>
 );
 
+const WhatsappIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.288.173-1.413-.074-.124-.272-.198-.57-.347z" />
+    <path d="M12.05 2C6.5 2 2 6.475 2 11.987c0 1.98.575 3.83 1.567 5.396L2 22l4.75-1.523a10.02 10.02 0 0 0 5.3 1.51h.004c5.55 0 10.05-4.475 10.05-9.987C22.104 6.487 17.6 2 12.05 2zm0 18.163h-.003a8.5 8.5 0 0 1-4.339-1.19l-.312-.185-3.226 1.034 1.055-3.146-.204-.323a8.36 8.36 0 0 1-1.309-4.522c0-4.641 3.79-8.417 8.443-8.417 2.256 0 4.375.877 5.97 2.468a8.363 8.363 0 0 1 2.472 5.955c0 4.641-3.79 8.326-8.547 8.326z" />
+  </svg>
+);
+
 const NAV_LINKS = [
   { label: "Home", to: "/" },
   { label: "Properties", to: "/properties" },
@@ -54,6 +61,8 @@ const COMPANY_LINKS = [
   { label: "Collaboration", to: "/collaboration" },
   { label: "Contact & Support", to: "/contact" },
 ];
+
+const WHATSAPP_NUMBER = "911234567890"; // update with your actual WhatsApp number (no + or spaces)
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -129,9 +138,21 @@ const Navbar = () => {
             </div>
           </nav>
 
-          <Link to="/contact" className="rk-cta">
-            Enquire Now
-          </Link>
+          <div className="rk-nav__actions">
+            <Link to="/contact" className="rk-cta">
+              Enquire Now
+            </Link>
+
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rk-whatsapp"
+              aria-label="Chat on WhatsApp"
+            >
+              <WhatsappIcon />
+            </a>
+          </div>
 
           <button
             className="rk-burger"
@@ -151,9 +172,21 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          <Link to="/contact" onClick={() => setMobileOpen(false)} className="rk-cta rk-cta--block">
-            Enquire Now
-          </Link>
+          <div className="rk-mobile__actions">
+            <Link to="/contact" onClick={() => setMobileOpen(false)} className="rk-cta rk-cta--block">
+              Enquire Now
+            </Link>
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rk-whatsapp rk-whatsapp--block"
+              aria-label="Chat on WhatsApp"
+            >
+              <WhatsappIcon />
+              <span>Chat on WhatsApp</span>
+            </a>
+          </div>
         </div>
       )}
     </header>

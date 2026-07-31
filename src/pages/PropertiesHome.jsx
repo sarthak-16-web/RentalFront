@@ -87,6 +87,12 @@ const PropertiesHome = () => {
     return MOCK_PROPERTIES.filter((p) => p.category === activeTag);
   }, [activeTag]);
 
+  // Duplicate the list so the marquee track can loop seamlessly (0% -> -50%)
+  const trackItems = useMemo(
+    () => [...visibleProperties, ...visibleProperties],
+    [visibleProperties]
+  );
+
   return (
     <>
       {/* ================= HERO ================= */}
@@ -164,13 +170,17 @@ const PropertiesHome = () => {
             </Reveal>
           </div>
 
-          <div className="rk-prop__rows">
-            {visibleProperties.map((p, i) => (
-              <Reveal direction="up" delay={90 + i * 60} key={p._id}>
-                <PropertyTile p={p} />
-              </Reveal>
-            ))}
-          </div>
+          <Reveal direction="up" delay={90}>
+            <div className="rk-prop__marquee">
+              <div className="rk-prop__track">
+                {trackItems.map((p, i) => (
+                  <div className="rk-prop__track-item" key={`${p._id}-${i}`}>
+                    <PropertyTile p={p} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
 
           <Reveal direction="up" delay={120}>
             <div className="rk-prop__more">

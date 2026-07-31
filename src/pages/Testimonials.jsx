@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { MOCK_TESTIMONIALS } from "../data/mockTestimonials";
 import "./Testimonials.css";
 
@@ -44,23 +45,203 @@ const ReviewCard = ({ review }) => (
   </div>
 );
 
+// Fields mirror the Testimonial model: name, property, rating, text.
+const initialForm = {
+  name: "",
+  property: "",
+  rating: 0,
+  text: "",
+};
+
 const Testimonials = () => {
+  // Mock mode: new reviews live in local state, merged on top of
+  // MOCK_TESTIMONIALS. Once the API is ready, fetch the real list with
+  // getAllTestimonials on mount instead, and POST to /add on submit.
+  const [localReviews, setLocalReviews] = useState([]);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [form, setForm] = useState(initialForm);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const allReviews = [...localReviews, ...MOCK_TESTIMONIALS];
+
+  const handleChange = (field) => (e) =>
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const handleRatingClick = (value) =>
+    setForm((prev) => ({ ...prev, rating: value }));
+
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setForm(initialForm);
+    setHoverRating(0);
+    setError("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!form.name.trim() || !form.property.trim() || !form.text.trim()) {
+      setError("Please fill in every field.");
+      return;
+    }
+    if (form.rating === 0) {
+      setError("Please select a star rating.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    // --- MOCK MODE ---
+    // Replace this block with a real request once the API is ready, e.g.:
+    //
+    // const res = await fetch("/api/testimonials/add", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(form),
+    // });
+    // const data = await res.json();
+    // setLocalReviews((prev) => [data.testimonial, ...prev]);
+
+    const newReview = {
+      _id: `local-${Date.now()}`,
+      ...form,
+      rating: Number(form.rating),
+    };
+    setLocalReviews((prev) => [newReview, ...prev]);
+
+    setSubmitting(false);
+    closeForm();
+  };
+
   return (
     <div className="rk-treviews">
       <div className="rk-treviews__header">
         <div className="rk-treviews__header-inner">
-          <p className="rk-treviews__eyebrow">What people say</p>
-          <h1>All Testimonials</h1>
-          <p className="rk-treviews__sub">
-            {MOCK_TESTIMONIALS.length} reviews from tenants, owners, and
-            businesses who worked with RentalKing.
-          </p>
+          <div className="rk-treviews__header-text">
+            <p className="rk-treviews__eyebrow">What people say</p>
+            <h1>All Testimonials</h1>
+            <p className="rk-treviews__sub">
+              {allReviews.length} reviews from tenants, owners, and
+              businesses who worked with RentalKing.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="rk-treviews__writebtn"
+            onClick={() => setIsFormOpen(true)}
+          >
+            Write a Review
+          </button>
         </div>
       </div>
 
+      {isFormOpen && (
+        <div className="rk-rform__overlay" onClick={closeForm}>
+          <div
+            className="rk-rform"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rk-rform-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="rk-rform__close"
+              onClick={closeForm}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+
+            <p className="rk-rform__eyebrow">Share your experience</p>
+            <h2 id="rk-rform-title" className="rk-rform__title">
+              Write a Review
+            </h2>
+
+            <form className="rk-rform__form" onSubmit={handleSubmit}>
+              <div className="rk-rform__field">
+                <label htmlFor="rk-rating">Your rating</label>
+                <div
+                  className="rk-rform__rating"
+                  onMouseLeave={() => setHoverRating(0)}
+                >
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      type="button"
+                      key={star}
+                      className="rk-rform__star"
+                      onMouseEnter={() => setHoverRating(star)}
+                      onClick={() => handleRatingClick(star)}
+                      aria-label={`${star} star${star > 1 ? "s" : ""}`}
+                    >
+                      <StarIcon filled={star <= (hoverRating || form.rating)} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rk-rform__field">
+                <label htmlFor="rk-name">Full name</label>
+                <input
+                  id="rk-name"
+                  type="text"
+                  placeholder="e.g. Ayesha Kapoor"
+                  value={form.name}
+                  onChange={handleChange("name")}
+                />
+              </div>
+
+              <div className="rk-rform__field">
+                <label htmlFor="rk-property">Property / Relation</label>
+                <input
+                  id="rk-property"
+                  type="text"
+                  placeholder="e.g. Owner, Sunrise Apartments"
+                  value={form.property}
+                  onChange={handleChange("property")}
+                />
+              </div>
+
+              <div className="rk-rform__field">
+                <label htmlFor="rk-text">Your review</label>
+                <textarea
+                  id="rk-text"
+                  rows={4}
+                  placeholder="Tell us about your experience..."
+                  value={form.text}
+                  onChange={handleChange("text")}
+                />
+              </div>
+
+              {error && <p className="rk-rform__error">{error}</p>}
+
+              <div className="rk-rform__actions">
+                <button
+                  type="button"
+                  className="rk-rform__cancel"
+                  onClick={closeForm}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rk-rform__submit"
+                  disabled={submitting}
+                >
+                  {submitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="rk-treviews__body">
         <div className="rk-treviews__grid">
-          {MOCK_TESTIMONIALS.map((r) => (
+          {allReviews.map((r) => (
             <ReviewCard key={r._id} review={r} />
           ))}
         </div>

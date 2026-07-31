@@ -59,11 +59,5 @@ export const MOCK_TESTIMONIALS = [
     rating: 4,
     text: "Bought a residential plot with clear title verification handled by their team. Made the whole process much less stressful.",
   },
-  {
-    _id: "rev9",
-    name: "Ananya Joshi",
-    property: "Skyline Heights, Bhopal",
-    rating: 5,
-    text: "Booked an upcoming project unit early through RentalKing and got regular construction updates. Felt well informed at every stage.",
-  },
+ 
 ];

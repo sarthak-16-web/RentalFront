@@ -333,3 +333,109 @@
     position: static;
   }
 }
+/*==================================================
+FEATURED PROPERTIES — ROLLING MARQUEE
+==================================================*/
+
+.rk-prop__marquee{
+    position:relative;
+
+    width:100%;
+    overflow:hidden;
+
+    margin-top:48px;
+
+    /* fade the edges so cards don't hard-cut */
+    -webkit-mask-image: linear-gradient(
+        90deg,
+        transparent 0,
+        #000 5%,
+        #000 95%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        90deg,
+        transparent 0,
+        #000 5%,
+        #000 95%,
+        transparent 100%
+    );
+}
+
+.rk-prop__track{
+    display:flex;
+    align-items:stretch;
+    gap:28px;
+
+    width:max-content;
+
+    animation: rk-prop-scroll 34s linear infinite;
+}
+
+.rk-prop__marquee:hover .rk-prop__track{
+    animation-play-state:paused;
+}
+
+@keyframes rk-prop-scroll{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+}
+
+.rk-prop__track-item{
+    flex:0 0 auto;
+    width:380px;
+}
+
+/* Bigger cards */
+
+.rk-prop__track-item .rk-ptile__media{
+    height:300px;
+    border-radius:18px;
+}
+
+.rk-prop__track-item .rk-ptile__media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.rk-prop__track-item .rk-ptile__caption h4{
+    font-size:1.15rem;
+}
+
+.rk-prop__track-item .rk-ptile__caption strong{
+    font-size:1.05rem;
+}
+
+/*==================================================
+RESPONSIVE
+==================================================*/
+
+@media(max-width:768px){
+
+    .rk-prop__track{
+        gap:18px;
+        animation-duration:24s;
+    }
+
+    .rk-prop__track-item{
+        width:260px;
+    }
+
+    .rk-prop__track-item .rk-ptile__media{
+        height:210px;
+        border-radius:14px;
+    }
+}
+
+/* Respect reduced-motion preference */
+
+@media (prefers-reduced-motion: reduce){
+    .rk-prop__track{
+        animation:none;
+    }
+    .rk-prop__marquee{
+        overflow-x:auto;
+    }
+}

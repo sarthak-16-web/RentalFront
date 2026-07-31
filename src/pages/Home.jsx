@@ -273,7 +273,7 @@ const Home = () => {
           <div className="rk-hh__upcoming">
             <div className="rk-hh__right-head rk-hh__right-head--tight">
               <h3>Upcoming Projects</h3>
-              <a href="/upcoming-projects" className="rk-hh__viewall">
+              <a href="/upcoming" className="rk-hh__viewall">
                 View all <ArrowIcon />
               </a>
             </div>

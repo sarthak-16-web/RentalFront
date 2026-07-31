@@ -20,7 +20,7 @@ SECTION
     background:
         radial-gradient(circle at top right,#fdfaf5 0%,transparent 45%),
         linear-gradient(180deg,#ffffff 0%,#f7f4ef 100%);
-    padding:130px 24px;
+    padding:10px 24px;
 }
 
 .rk-upc::before{
@@ -142,16 +142,19 @@ ROW
 
     display:grid;
 
-    grid-template-columns:
-        1fr
-        70px
-        1fr;
+    grid-template-columns: 1fr 1fr;
 
     align-items:center;
 
     gap:70px;
 
     position:relative;
+}
+
+.rk-upc__row > .rk-upc__content,
+.rk-upc__row > .rk-upc__media{
+
+    min-width:0;
 }
 
 .rk-upc__row--rev{
@@ -170,13 +173,27 @@ TIMELINE
 
 .rk-upc__rail{
 
-    position:relative;
+    position:absolute;
+
+    left:50%;
+
+    top:0;
+
+    bottom:0;
+
+    transform:translateX(-50%);
+
+    width:70px;
 
     height:100%;
 
     display:flex;
 
     justify-content:center;
+
+    z-index:1;
+
+    pointer-events:none;
 }
 
 .rk-upc__railline{
@@ -225,6 +242,8 @@ IMAGE
 .rk-upc__media{
 
     position:relative;
+
+    z-index:2;
 }
 
 .rk-upc__imgwrap{
@@ -365,6 +384,8 @@ CONTENT PANEL
 .rk-upc__content{
 
     position:relative;
+
+    z-index:2;
 
     background:rgba(255,255,255,.88);
 

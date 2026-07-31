@@ -96,7 +96,7 @@ const ProjectRow = ({ project, index }) => {
           </span>
         </div>
 
-        <a href={`/contact/${project._id}`} className="rk-upc__cta">
+        <a href="/contact "className="rk-upc__cta">
           Connect<ArrowIcon />
         </a>
       </Reveal>
