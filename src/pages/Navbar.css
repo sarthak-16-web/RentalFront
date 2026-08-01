@@ -4,7 +4,17 @@
   z-index: 50;
   font-family: var(--font-body);
 }
+.rk-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
 
+.rk-logo__img {
+  height: 50px;      /* Adjust as needed */
+  width: auto;
+  display: block;
+}
 /* Top utility bar */
 .rk-topbar {
   background: var(--color-navy-950);
@@ -247,7 +257,7 @@ MOBILE MENU — FIX
 }
 
 .rk-logo__text em {
-  color: var(--color-gold-500);
+  color: rgb(134, 3, 3);
   font-style: italic;
 }
 

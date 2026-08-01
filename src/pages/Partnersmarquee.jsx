@@ -3,14 +3,12 @@ import "./Partnersmarquee.css";
 // TEMPORARY placeholder names — replace with real partner logos (as <img> tags)
 // once you have them. Keep the list length even for a smooth seamless loop.
 const PARTNERS = [
-  "Prime Estates",
-  "Bluewave Finance",
-  "Skyline Builders",
-  "Metro Realty Group",
-  "Urban Developers Co.",
-  "Northgate Properties",
-  "Vantage Home Loans",
-  "Crestview Realty",
+  { name: "Emerald Builders", logo: "/emerald.jfif" },
+  { name: "NSR Group", logo: "/nsr.jfif" },
+  { name: "Unity One Co.", logo: "/unity.jpeg" },
+  { name: "Godrej Properties", logo: "/goorej.jpeg" },
+  { name: "Shubhashish Homes", logo: "/shubhashish.jpeg" },
+  { name: "M. Jhaveri Group", logo: "/M jhaveri.jpeg" },
 ];
 
 const PartnersMarquee = () => {
@@ -19,16 +17,19 @@ const PartnersMarquee = () => {
 
   return (
     <section className="rk-partners">
-      <p className="rk-partners__label">Trusted by leading names in real estate &amp; finance</p>
-      <div className="rk-partners__viewport">
-        <div className="rk-partners__track">
-          {track.map((name, i) => (
-            <span className="rk-partners__item" key={`${name}-${i}`}>
-              {name}
-            </span>
-          ))}
-        </div>
-      </div>
+      <p className="rk-partners__label">Channel Partners</p>
+     <div className="rk-partners__track">
+  {track.map((partner, i) => (
+    <div className="rk-partners__item" key={`${partner.name}-${i}`}>
+      <img
+        src={partner.logo}
+        alt={partner.name}
+        className="rk-partners__logo"
+      />
+      <span>{partner.name}</span>
+    </div>
+  ))}
+</div>
     </section>
   );
 };

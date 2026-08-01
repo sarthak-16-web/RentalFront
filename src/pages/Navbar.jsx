@@ -62,7 +62,7 @@ const COMPANY_LINKS = [
   { label: "Contact & Support", to: "/contact" },
 ];
 
-const WHATSAPP_NUMBER = "911234567890"; // update with your actual WhatsApp number (no + or spaces)
+const WHATSAPP_NUMBER = "919300653927"; // update with your actual WhatsApp number (no + or spaces)
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -82,10 +82,10 @@ const Navbar = () => {
         <div className="rk-topbar__inner">
           <div className="rk-topbar__contact">
             <a href="tel:+911234567890">
-              <PhoneIcon /> <span>+91 12345 67890</span>
+              <PhoneIcon /> <span>+91 93006 53927</span>
             </a>
             <a href="mailto:hello@rentalking.com">
-              <MailIcon /> <span>hello@rentalking.com</span>
+              <MailIcon /> <span>rentalking101@gmail.com</span>
             </a>
           </div>
           <p className="rk-topbar__tagline">Homes and spaces, matched right.</p>
@@ -96,12 +96,11 @@ const Navbar = () => {
       <div className="rk-nav">
         <div className="rk-nav__inner">
           <Link to="/" className="rk-logo" onClick={() => setMobileOpen(false)}>
-            <span className="rk-logo__mark" aria-hidden="true">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                <path d="M3 12 12 4l9 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M6 11v9h12v-9" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
+           <img
+  src={"logo.jpeg"}
+  alt="Rental King"
+  className="rk-logo__img"
+/>
             <span className="rk-logo__text">
               Rental<em>King</em>
             </span>

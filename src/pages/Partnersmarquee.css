@@ -3,6 +3,48 @@
   padding: 32px 0 36px;
   overflow: hidden;
 }
+.rk-partners__item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 40px;
+}
+
+.rk-partners__logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.rk-partners__item span {
+  color: rgba(255,255,255,.75);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rk-partners__item {
+  flex-shrink: 0;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rk-partners__logo {
+  height: 42px;
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.75;
+  transition: all 0.3s ease;
+}
+
+.rk-partners__logo:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.05);
+}
 
 .rk-partners__label {
   text-align: center;

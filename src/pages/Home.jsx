@@ -91,13 +91,14 @@ const PinIcon = () => (
   </svg>
 );
 
-const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial"];
-const STATUSES = ["For Rent", "For Sale"];
+const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial" , "Warehouse"];
+const STATUSES = ["For Rent", "For Sale" ,"Co Working","Pre Leased"];
 const BATH_OPTIONS = [1, 2, 3, 4, "5+"];
 const BED_OPTIONS = [1, 2, 3, 4, "5+"];
-const PRICE_MIN = 0, PRICE_MAX = 100000;
-const AREA_MIN = 0, AREA_MAX = 5000;
-
+const PRICE_MIN = 0, PRICE_MAX = 100000000;
+const AREA_MIN = 0, AREA_MAX = 200000;
+const BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"];
+const Furnishing_Status = ["Semi","Full","NA"];
 const DualRange = ({ label, unit, min, max, step, valueMin, valueMax, onChangeMin, onChangeMax }) => {
   const pctMin = ((valueMin - min) / (max - min)) * 100;
   const pctMax = ((valueMax - min) / (max - min)) * 100;
@@ -206,7 +207,8 @@ const Home = () => {
               <select value={location} onChange={(e) => setLocation(e.target.value)}>
                 <option value="">Choose Location</option>
                 <option value="Indore">Indore</option>
-                <option value="Jabalpur">Jabalpur</option>
+                <option value="Jabalpur">Prithampur</option>
+                <option value="Ujjain">Ujjain</option>
                 <option value="Bhopal">Bhopal</option>
               </select>
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -225,9 +227,13 @@ const Home = () => {
                 {BATH_OPTIONS.map((b) => <option key={b} value={b}>{b}</option>)}
               </select>
               <select value={beds} onChange={(e) => setBeds(e.target.value)}>
-                <option value="">Min Beds</option>
-                {BED_OPTIONS.map((b) => <option key={b} value={b}>{b}</option>)}
-              </select>
+  <option value="">BHK</option>
+  {BHK_OPTIONS.map((b) => (
+    <option key={b} value={b}>
+      {b}
+    </option>
+  ))}
+</select>
             </div>
 
             <DualRange label="Price Range" unit="₹" min={PRICE_MIN} max={PRICE_MAX} step={500}

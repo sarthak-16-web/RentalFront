@@ -7,37 +7,37 @@ const TEAM = [
     name: "Mr. Rajesh Maheshwari",
     role: "Founder & CEO",
     blurb: "Visionary behind RentalKing",
-    photo: "https://picsum.photos/seed/rk-team-1/400/400",
+    photo: "Rajesh.jpeg",
   },
   {
     name: "Dr. Saloni Maheshwari",
     role: "Project Head",
     blurb: "Leading projects & operations",
-    photo: "https://picsum.photos/seed/rk-team-2/400/400",
+    photo: "saloni.jpeg",
   },
   {
     name: "Bhushan Thombre",
     role: "Sales Head",
     blurb: "Commercial & residential sales expert",
-    photo: "https://picsum.photos/seed/rk-team-3/400/400",
+    photo: "bhusan .jpeg",
   },
   {
     name: "Anjali Mandre",
     role: "HR Manager",
     blurb: "People & culture at RentalKing",
-    photo: "https://picsum.photos/seed/rk-team-4/400/400",
+    photo: "anjali.PNG",
   },
   {
     name: "Ayush Rathor",
     role: "Senior Sales Executive",
     blurb: "Premium property specialist",
-    photo: "https://picsum.photos/seed/rk-team-5/400/400",
+    photo: "ayush.jpeg",
   },
   {
     name: "Parag Wadkar",
     role: "Sales Executive",
     blurb: "Residential & commercial rentals",
-    photo: "https://picsum.photos/seed/rk-team-6/400/400",
+    photo: "parag.jpeg",
   },
 ];
 

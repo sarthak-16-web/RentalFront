@@ -21,7 +21,7 @@ function App() {
   return (
   
     <BrowserRouter>
-   {/* <ScrollToTop></ScrollToTop> */}
+     <ScrollToTop></ScrollToTop>
       <Navbar />
 
       <Routes>

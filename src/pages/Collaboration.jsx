@@ -1,5 +1,25 @@
 import { useEffect, useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
 import "./Collaboration.css";
+
+/* ---------- Notification config ----------
+   Reuses the same EmailJS account as Contactus.jsx.
+   You can reuse the same template, or create a second one with
+   variables: name, type, phone, email, message
+------------------------------------------------ */
+
+ /* template_3xcu01a    RnRTEMKPRfdCOwYG-  service_08siof8 */ 
+
+const EMAILJS_SERVICE_ID = "service_08siof8";
+const EMAILJS_TEMPLATE_ID = "template_3xcu01a";
+const EMAILJS_PUBLIC_KEY = "RnRTEMKPRfdCOwYG";
+
+const WHATSAPP_NUMBER = "919300653927"; // country code + number, no + or spaces
+
+const buildWhatsappLink = (form) => {
+  const text = `New Partner Inquiry%0A%0AName/Company: ${form.name}%0AType: ${form.type}%0APhone: ${form.phone}%0AEmail: ${form.email}%0AMessage: ${form.message}`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+};
 
 /* ---------- Icons ---------- */
 const HomeIcon = () => (
@@ -139,14 +159,35 @@ const Collaboration = () => {
 
   const [form, setForm] = useState({ name: "", type: "", phone: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: replace with real API call once a /api/collaboration backend route exists
-    console.log("Partner inquiry submitted:", form);
-    setSubmitted(true);
+    setError("");
+    setSending(true);
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name: form.name,
+          type: form.type,
+          phone: form.phone,
+          email: form.email,
+          message: form.message,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      );
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Email send failed:", err);
+      setError("Couldn't send automatically — tap 'Message us on WhatsApp' below instead.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -250,6 +291,7 @@ const Collaboration = () => {
           ) : (
             <form onSubmit={handleSubmit}>
               <h3>Become a Partner</h3>
+              {error && <p className="rk-collab__error">{error}</p>}
               <div className="rk-collab__row">
                 <div className="rk-collab__field">
                   <label htmlFor="name">Name / Company</label>
@@ -277,7 +319,18 @@ const Collaboration = () => {
                 <label htmlFor="message">Message</label>
                 <textarea id="message" name="message" rows={4} required value={form.message} onChange={handleChange} placeholder="Tell us about your business..." />
               </div>
-              <button type="submit" className="rk-collab__submit"><SendIcon /> Submit Inquiry</button>
+              <button type="submit" className="rk-collab__submit" disabled={sending}>
+                <SendIcon /> {sending ? "Sending..." : "Submit Inquiry"}
+              </button>
+
+              <a
+                href={buildWhatsappLink(form)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rk-collab__whatsapp"
+              >
+                Message us on WhatsApp instead
+              </a>
             </form>
           )}
         </div>

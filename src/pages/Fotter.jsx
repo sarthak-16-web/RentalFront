@@ -30,7 +30,7 @@ const LinkedinIcon = () => (
 const EXPLORE_LINKS = [
   { label: "Properties", to: "/properties" },
   { label: "Featured", to: "/featured" },
-  { label: "Upcoming Projects", to: "/upcoming-projects" },
+  { label: "Upcoming Projects", to: "/upcoming" },
   { label: "Testimonials", to: "/testimonials" },
 ];
 

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import Reveal from "../components/Reveal";
  import heroBuilding from "/imagecopy.png";
 import "./PropertiesHome.css";
+import { useNavigate } from "react-router-dom";
 
 const ArrowIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -80,6 +81,7 @@ const PropertyTile = ({ p }) => (
 );
 
 const PropertiesHome = () => {
+  const navigate = useNavigate();
   const [activeTag, setActiveTag] = useState("All");
 
   const visibleProperties = useMemo(() => {
@@ -106,7 +108,7 @@ const PropertiesHome = () => {
 
         <div className="rk-hero__inner">
           <Reveal direction="up">
-            <span className="rk-hero__eyebrow">Jabalpur's Address of Choice</span>
+            <span className="rk-hero__eyebrow">Poha Pradesh</span>
           </Reveal>
 
           <Reveal direction="up" delay={80}>
@@ -137,13 +139,16 @@ const PropertiesHome = () => {
             <div className="rk-prop__tags rk-hero__tags">
               {CATEGORY_TAGS.map((tag) => (
                 <button
-                  key={tag}
-                  type="button"
-                  className={`rk-prop__tag${activeTag === tag ? " is-active" : ""}`}
-                  onClick={() => setActiveTag(tag)}
-                >
-                  {tag}
-                </button>
+  key={tag}
+  type="button"
+  className={`rk-prop__tag${activeTag === tag ? " is-active" : ""}`}
+  onClick={() => {
+    setActiveTag(tag);
+    navigate("/properties");
+  }}
+>
+  {tag}
+</button>
               ))}
             </div>
           </Reveal>

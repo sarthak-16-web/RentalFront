@@ -1,5 +1,25 @@
 import { useState } from "react";
+import emailjs from "@emailjs/browser";
 import "./Contactus.css";
+
+/* ---------- Notification config ----------
+   1) Sign up at https://www.emailjs.com (free tier: 200 emails/month)
+   2) Add an Email Service (e.g. Gmail) connected to rentalking101@gmail.com
+   3) Create an Email Template with variables: name, email, phone, subject, message
+   4) Paste your Service ID / Template ID / Public Key below
+------------------------------------------------ */
+const EMAILJS_SERVICE_ID = "service_08siof8";
+const EMAILJS_TEMPLATE_ID = "template_3xcu01a";
+const EMAILJS_PUBLIC_KEY = "RnRTEMKPRfdCOwYG";
+
+const WHATSAPP_NUMBER = "919300653927"; // country code + number, no + or spaces
+
+const buildWhatsappLink = (form) => {
+  const text = `New Contact Form Submission%0A%0AName: ${form.name}%0APhone: ${form.phone}%0AEmail: ${form.email}%0ASubject: ${form.subject}%0AMessage: ${form.message}`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+};
+
+const EMPTY_FORM = { name: "", email: "", phone: "", subject: "", message: "" };
 
 const PhoneIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -37,33 +57,55 @@ const SendIcon = () => (
 );
 
 const INFO_CARDS = [
-  { icon: PhoneIcon, label: "Call Us", value: "+91 12345 67890", href: "tel:+911234567890" },
-  { icon: MailIcon, label: "Email Us", value: "hello@rentalking.com", href: "mailto:hello@rentalking.com" },
-  { icon: PinIcon, label: "Visit Us", value: "Vijay Nagar, Indore, MP", href: null },
+  { icon: PhoneIcon, label: "Call Us", value: "+91 93006 53927", href: "tel:+919300653927" },
+  { icon: MailIcon, label: "Email Us", value: "rentalking101@gmail.com", href: "rentalking101.com" },
+  { icon: PinIcon, label: "Visit Us", value: "211,NRK BIZ PARK,PU 4, Behind C21 mall, Indore", href: null },
   { icon: ClockIcon, label: "Office Hours", value: "Mon – Sat, 9:00 AM – 7:00 PM", href: null },
 ];
 
 const SUBJECTS = ["General Inquiry", "Property Enquiry", "List a Property", "Support"];
 
 const ContactUs = () => {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: "",
-  });
+  const [form, setForm] = useState(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: replace with real API call once a /api/contact backend route exists
-    console.log("Contact form submitted:", form);
-    setSubmitted(true);
+    setError("");
+    setSending(true);
+    try {
+      const response = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          subject: form.subject,
+          message: form.message,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      );
+      console.log("EmailJS success:", response.status, response.text);
+      setSubmitted(true);
+      setForm(EMPTY_FORM);
+    } catch (err) {
+      console.error("EmailJS failed:", err);
+      setError("Couldn't send automatically — tap 'Message us on WhatsApp' below instead.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleSendAnother = () => {
+    setSubmitted(false);
+    setForm(EMPTY_FORM);
   };
 
   return (
@@ -117,13 +159,14 @@ const ContactUs = () => {
                 <span className="rk-contact__success-icon"><CheckIcon /></span>
                 <h3>Message Sent</h3>
                 <p>Thanks for reaching out — our team will get back to you shortly.</p>
-                <button type="button" onClick={() => setSubmitted(false)}>
+                <button type="button" onClick={handleSendAnother}>
                   Send another message
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
                 <h3 className="rk-contact__form-title">Send us a message</h3>
+                {error && <p className="rk-contact__error">{error}</p>}
 
                 <div className="rk-contact__row rk-contact__row--2">
                   <div className="rk-contact__field">
@@ -188,9 +231,18 @@ const ContactUs = () => {
                   />
                 </div>
 
-                <button type="submit" className="rk-contact__submit">
-                  <SendIcon /> Send Message
+                <button type="submit" className="rk-contact__submit" disabled={sending}>
+                  <SendIcon /> {sending ? "Sending..." : "Send Message"}
                 </button>
+
+                <a
+                  href={buildWhatsappLink(form)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rk-contact__whatsapp"
+                >
+                  Message us on WhatsApp instead
+                </a>
               </form>
             )}
           </div>
