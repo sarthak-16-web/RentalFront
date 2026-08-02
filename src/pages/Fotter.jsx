@@ -41,9 +41,9 @@ const COMPANY_LINKS = [
 ];
 
 const LEGAL_LINKS = [
-  { label: "Terms", to: "/terms" },
-  { label: "Privacy Policy", to: "/privacy" },
-  { label: "Cookies", to: "/cookies" },
+  { label: "Terms", to: "/legal" },
+  { label: "Privacy Policy", to: "/legal" },
+  { label: "Cookies", to: "/legal" },
 ];
 
 const Footer = () => {
@@ -55,10 +55,12 @@ const Footer = () => {
         <div className="rk-footer__top">
           <div className="rk-footer__brand">
             <Link to="/" className="rk-footer__logo">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M3 12 12 4l9 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M6 11v9h12v-9" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+             
+               <img
+  src={"logo.jpeg"}
+  alt="Rental King"
+  className="rk-logo__img"
+/>
               Rental<em>King</em>
             </Link>
             <p className="rk-footer__tagline">
@@ -66,10 +68,10 @@ const Footer = () => {
               visits every listing.
             </p>
             <div className="rk-footer__socials">
-              <a href="#" aria-label="Facebook"><FacebookIcon /></a>
+              <a href="https://www.facebook.com/share/1D11o5YmR5/?mibextid=wwXIfr" aria-label="Facebook"><FacebookIcon /></a>
               <a href="#" aria-label="Twitter"><TwitterIcon /></a>
-              <a href="#" aria-label="Instagram"><InstagramIcon /></a>
-              <a href="#" aria-label="LinkedIn"><LinkedinIcon /></a>
+              <a href="https://www.instagram.com/rentalkingindore?igsh=MTRtcmdrZ2RlY2dwaA==" aria-label="Instagram"><InstagramIcon /></a>
+              <a href="#" aria-label="Linkedin "><LinkedinIcon /></a>
             </div>
           </div>
 

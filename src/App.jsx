@@ -17,6 +17,7 @@ import ContactUs from "./pages/Contactus";
  import TeamMemberDetails from "./pages/Teammemberdetails";
  import UpcomingProjects from "./pages/Upcomingprojects";
  import FeaturedProperties from "./pages/FeaturedProperties";
+ import Legalpage from "./pages/Legalpage";
 function App() {
   return (
   
@@ -47,6 +48,7 @@ function App() {
         <Route path="/team" element={<TeamMemberDetails />} />
         <Route path="/upcoming" element={<UpcomingProjects />} />
         <Route path="/featured" element={<FeaturedProperties />} />
+        <Route path="/legal" element={< Legalpage/>} />
         
       </Routes>
 

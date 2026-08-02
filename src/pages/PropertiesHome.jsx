@@ -129,9 +129,14 @@ const PropertiesHome = () => {
               <a href="/properties" className="rk-prop__cta">
                 Explore Properties <ArrowIcon />
               </a>
-              <a href="/contact" className="rk-hero__cta-ghost">
-                Talk To An Advisor
-              </a>
+     <a
+  href="https://wa.me/+919425959771?text=Hi%20RK%20Estate,%20I'm%20interested%20in%20your%20properties.%20Please%20contact%20me."
+  target="_blank"
+  rel="noopener noreferrer"
+  className="rk-hero__cta-ghost"
+>
+  Talk To An Advisor
+</a>
             </div>
           </Reveal>
 
