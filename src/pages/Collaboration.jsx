@@ -1,24 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import emailjs from "@emailjs/browser";
 import "./Collaboration.css";
 
-/* ---------- Notification config ----------
-   Reuses the same EmailJS account as Contactus.jsx.
-   You can reuse the same template, or create a second one with
-   variables: name, type, phone, email, message
------------------------------------------------- */
-
- /* template_3xcu01a    RnRTEMKPRfdCOwYG-  service_08siof8 */ 
-
-const EMAILJS_SERVICE_ID = "service_08siof8";
-const EMAILJS_TEMPLATE_ID = "template_3xcu01a";
-const EMAILJS_PUBLIC_KEY = "RnRTEMKPRfdCOwYG";
+/* ----------------------------------------------------------------
+   On submit, we just build a wa.me link with the filled-in details
+   and open WhatsApp (app or web) in a new tab/window. The user
+   still has to hit "Send" inside WhatsApp themselves — nothing is
+   sent automatically from here, so no backend / EmailJS needed.
+------------------------------------------------------------------- */
 
 const WHATSAPP_NUMBER = "919300653927"; // country code + number, no + or spaces
 
 const buildWhatsappLink = (form) => {
-  const text = `New Partner Inquiry%0A%0AName/Company: ${form.name}%0AType: ${form.type}%0APhone: ${form.phone}%0AEmail: ${form.email}%0AMessage: ${form.message}`;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+  const text =
+    `New Partner Inquiry\n\n` +
+    `Name/Company: ${form.name}\n` +
+    `Type: ${form.type}\n` +
+    `Phone: ${form.phone}\n` +
+    `Email: ${form.email}\n` +
+    `Message: ${form.message}`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 };
 
 /* ---------- Icons ---------- */
@@ -157,37 +157,19 @@ const Collaboration = () => {
     return () => observer.disconnect();
   }, []);
 
-  const [form, setForm] = useState({ name: "", type: "", phone: "", email: "", message: "" });
+  const EMPTY_FORM = { name: "", type: "", phone: "", email: "", message: "" };
+  const [form, setForm] = useState(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState("");
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError("");
-    setSending(true);
-    try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          name: form.name,
-          type: form.type,
-          phone: form.phone,
-          email: form.email,
-          message: form.message,
-        },
-        { publicKey: EMAILJS_PUBLIC_KEY }
-      );
-      setSubmitted(true);
-    } catch (err) {
-      console.error("Email send failed:", err);
-      setError("Couldn't send automatically — tap 'Message us on WhatsApp' below instead.");
-    } finally {
-      setSending(false);
-    }
+    // Open WhatsApp with the message pre-filled. User still has to
+    // hit Send inside WhatsApp themselves.
+    window.open(buildWhatsappLink(form), "_blank", "noopener,noreferrer");
+    setSubmitted(true);
+    setForm(EMPTY_FORM);
   };
 
   return (
@@ -253,7 +235,7 @@ const Collaboration = () => {
       <section className="rk-founder">
         <div className="rk-founder__inner">
           <div className="rk-founder__photo">
-            <img src="image.png" alt="Founder of RentalKing" />
+            <img src="Rajesh.jpeg" alt="Founder of RentalKing" />
           </div>
           <div className="rk-founder__content">
             <span className="rk-founder__quote-icon"><QuoteIcon /></span>
@@ -284,14 +266,13 @@ const Collaboration = () => {
           {submitted ? (
             <div className="rk-collab__success">
               <span><CheckIcon /></span>
-              <h3>Thanks for reaching out</h3>
-              <p>Our partnerships team will contact you within one business day.</p>
+              <h3>Almost done!</h3>
+              <p>We opened WhatsApp with your details filled in — just hit send there.</p>
               <button type="button" onClick={() => setSubmitted(false)}>Submit another inquiry</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <h3>Become a Partner</h3>
-              {error && <p className="rk-collab__error">{error}</p>}
               <div className="rk-collab__row">
                 <div className="rk-collab__field">
                   <label htmlFor="name">Name / Company</label>
@@ -319,18 +300,9 @@ const Collaboration = () => {
                 <label htmlFor="message">Message</label>
                 <textarea id="message" name="message" rows={4} required value={form.message} onChange={handleChange} placeholder="Tell us about your business..." />
               </div>
-              <button type="submit" className="rk-collab__submit" disabled={sending}>
-                <SendIcon /> {sending ? "Sending..." : "Submit Inquiry"}
+              <button type="submit" className="rk-collab__submit">
+                <SendIcon /> Submit via WhatsApp
               </button>
-
-              <a
-                href={buildWhatsappLink(form)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rk-collab__whatsapp"
-              >
-                Message us on WhatsApp instead
-              </a>
             </form>
           )}
         </div>

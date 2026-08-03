@@ -1,4 +1,6 @@
+import { useState } from "react";
 import "./Legalpage.css";
+import AccordionSection from "./Accordionsection";
 
 const LAST_UPDATED = "August 1, 2026";
 
@@ -352,7 +354,35 @@ const GROUPS = [
   },
 ];
 
+// First section open by default so the page doesn't look empty on load.
+const DEFAULT_OPEN_IDS = ["privacy-overview"];
+
 const LegalPage = () => {
+  const [openIds, setOpenIds] = useState(() => new Set(DEFAULT_OPEN_IDS));
+
+  const toggleSection = (id) => {
+    setOpenIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // TOC click: make sure the target section is open before the browser's
+  // native hash-scroll runs, so you don't jump to a collapsed panel.
+  const handleTocClick = (id) => {
+    setOpenIds((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  };
+
   return (
     <div className="rk-legal">
       <div className="rk-legal__header">
@@ -374,7 +404,13 @@ const LegalPage = () => {
                   {g.label}
                 </a>
                 {g.sections.map((s) => (
-                  <a key={s.id} href={`#${s.id}`}>{s.heading}</a>
+                  <a
+                    key={s.id}
+                    href={`#${s.id}`}
+                    onClick={() => handleTocClick(s.id)}
+                  >
+                    {s.heading}
+                  </a>
                 ))}
               </div>
             ))}
@@ -386,10 +422,15 @@ const LegalPage = () => {
             <div key={g.id} className="rk-legal__group">
               <h2 id={g.id} className="rk-legal__group-title">{g.label}</h2>
               {g.sections.map((s) => (
-                <section key={s.id} id={s.id} className="rk-legal__section">
-                  <h3>{s.heading}</h3>
+                <AccordionSection
+                  key={s.id}
+                  id={s.id}
+                  title={s.heading}
+                  open={openIds.has(s.id)}
+                  onToggle={() => toggleSection(s.id)}
+                >
                   {s.body}
-                </section>
+                </AccordionSection>
               ))}
             </div>
           ))}

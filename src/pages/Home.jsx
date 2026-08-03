@@ -97,8 +97,12 @@ const BATH_OPTIONS = [1, 2, 3, 4, "5+"];
 const BED_OPTIONS = [1, 2, 3, 4, "5+"];
 const PRICE_MIN = 0, PRICE_MAX = 100000000;
 const AREA_MIN = 0, AREA_MAX = 200000;
-const BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"];
-const Furnishing_Status = ["Semi","Full","NA"];
+const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK"];
+const FURNISHING_OPTIONS = [
+  "Furnished",
+  "Semi Furnished",
+  "Unfurnished",
+];
 const DualRange = ({ label, unit, min, max, step, valueMin, valueMax, onChangeMin, onChangeMax }) => {
   const pctMin = ((valueMin - min) / (max - min)) * 100;
   const pctMax = ((valueMax - min) / (max - min)) * 100;
@@ -163,6 +167,7 @@ const Home = () => {
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
+  const [furnishing, setFurnishing] = useState("");
   const [baths, setBaths] = useState("");
   const [beds, setBeds] = useState("");
   const [features, setFeatures] = useState("");
@@ -176,6 +181,7 @@ const Home = () => {
     const params = new URLSearchParams();
     if (location) params.set("location", location);
     if (category) params.set("category", category);
+    if (furnishing) params.set("furnishing", furnishing);
     if (status) params.set("status", status);
     if (baths) params.set("baths", baths);
     if (beds) params.set("beds", beds);
@@ -222,10 +228,15 @@ const Home = () => {
                 <option value="">Property Status</option>
                 {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
-              <select value={baths} onChange={(e) => setBaths(e.target.value)}>
-                <option value="">Min Baths</option>
-                {BATH_OPTIONS.map((b) => <option key={b} value={b}>{b}</option>)}
-              </select>
+              <select
+  value={furnishing}
+  onChange={(e) => setFurnishing(e.target.value)}
+>
+  <option value="">Furnishing</option>
+  <option value="Furnished">Furnished</option>
+  <option value="Semi Furnished">Semi Furnished</option>
+  <option value="Unfurnished">Unfurnished</option>
+</select>
               <select value={beds} onChange={(e) => setBeds(e.target.value)}>
   <option value="">BHK</option>
   {BHK_OPTIONS.map((b) => (

@@ -108,7 +108,7 @@ const PropertiesHome = () => {
 
         <div className="rk-hero__inner">
           <Reveal direction="up">
-            <span className="rk-hero__eyebrow">Poha Pradesh</span>
+            <span className="rk-hero__eyebrow">Indore , Madhya Pradesh</span>
           </Reveal>
 
           <Reveal direction="up" delay={80}>

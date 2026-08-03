@@ -61,7 +61,7 @@ const Footer = () => {
   alt="Rental King"
   className="rk-logo__img"
 />
-              Rental<em>King</em>
+              RentalKing
             </Link>
             <p className="rk-footer__tagline">
               Verified rentals and sales, curated by a team that actually
