@@ -4,7 +4,7 @@ import "./styles/variable.css";
 
 import { AdminAuthProvider } from "./context/AdminAuthContext";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
-
+import AppPreloader from "./components/AppPreloader";
 // Components
 import Navbar from "./pages/Navbar";
 import Fotter from "./pages/Fotter";
@@ -33,6 +33,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 function App() {
   return (
     <BrowserRouter>
+    <AppPreloader />
       <AdminAuthProvider>
         <ScrollToTop />
 

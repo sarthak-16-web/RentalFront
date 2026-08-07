@@ -1,62 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useProperties, useProjects } from "../hooks/useRentalKingData";
 import "./Home.css";
-
-// TEMPORARY mock data — replace with useProperty() from PropertyContext
-// once the backend is wired up. Shape matches the real Property model exactly
-// (name, price, location, beds, coverImage, isFeatured) so swapping later
-// is a one-line change.
-const MOCK_FEATURED = [
-  {
-    _id: "mock-1",
-    name: "Sunrise Apartments",
-    price: "₹45,000/month",
-    location: "Vijay Nagar, Indore",
-    beds: 3,
-    coverImage: "https://picsum.photos/seed/rentalking1/480/320",
-  },
-  {
-    _id: "mock-2",
-    name: "Oakwood Villa",
-    price: "₹1.2 Cr",
-    location: "Napier Town, Jabalpur",
-    beds: 4,
-    coverImage: "https://picsum.photos/seed/rentalking2/480/320",
-  },
-  {
-    _id: "mock-3",
-    name: "Riverside Residency",
-    price: "₹32,000/month",
-    location: "Arera Colony, Bhopal",
-    beds: 2,
-    coverImage: "https://picsum.photos/seed/rentalking3/480/320",
-  },
-];
-
-// TEMPORARY mock data — replace with real project API data once wired up
-const MOCK_PROJECTS = [
-  {
-    _id: "proj-1",
-    name: "Skyline Heights",
-    location: "Bawadiya Kalan, Bhopal",
-    status: "Launching Q3 2026",
-    image: "https://picsum.photos/seed/rentalproj1/160/160",
-  },
-  {
-    _id: "proj-2",
-    name: "Emerald Court",
-    location: "Vijay Nagar, Indore",
-    status: "Bookings Open",
-    image: "https://picsum.photos/seed/rentalproj2/160/160",
-  },
-//   {
-//     _id: "proj-3",
-//     name: "The Meridian",
-//     location: "Wright Town, Jabalpur",
-//     status: "Launching Q1 2027",
-//     image: "https://picsum.photos/seed/rentalproj3/160/160",
-//   },
-];
 
 const SearchIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
@@ -91,18 +36,12 @@ const PinIcon = () => (
   </svg>
 );
 
-const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial" , "Warehouse"];
-const STATUSES = ["For Rent", "For Sale" ,"Co Working","Pre Leased"];
-const BATH_OPTIONS = [1, 2, 3, 4, "5+"];
-const BED_OPTIONS = [1, 2, 3, 4, "5+"];
+const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial", "Warehouse"];
+const STATUSES = ["For Rent", "For Sale", "Co Working", "Pre Leased"];
 const PRICE_MIN = 0, PRICE_MAX = 100000000;
 const AREA_MIN = 0, AREA_MAX = 200000;
 const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK"];
-const FURNISHING_OPTIONS = [
-  "Furnished",
-  "Semi Furnished",
-  "Unfurnished",
-];
+
 const DualRange = ({ label, unit, min, max, step, valueMin, valueMax, onChangeMin, onChangeMax }) => {
   const pctMin = ((valueMin - min) / (max - min)) * 100;
   const pctMax = ((valueMax - min) / (max - min)) * 100;
@@ -160,15 +99,19 @@ const ProjectRow = ({ project }) => (
 
 const Home = () => {
   const navigate = useNavigate();
-  const featured = MOCK_FEATURED; // swap for useProperty().featured later
-  const loading = false;
   const scrollRef = useRef(null);
+
+  // Real data — cached by React Query, no refetch on every page switch.
+  const { data: properties = [], isLoading: propertiesLoading } = useProperties();
+  const { data: projects = [] } = useProjects();
+
+  const featured = properties.filter((p) => p.isFeatured);
+  const loading = propertiesLoading;
 
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
   const [furnishing, setFurnishing] = useState("");
-  const [baths, setBaths] = useState("");
   const [beds, setBeds] = useState("");
   const [features, setFeatures] = useState("");
   const [priceMin, setPriceMin] = useState(0);
@@ -183,7 +126,6 @@ const Home = () => {
     if (category) params.set("category", category);
     if (furnishing) params.set("furnishing", furnishing);
     if (status) params.set("status", status);
-    if (baths) params.set("baths", baths);
     if (beds) params.set("beds", beds);
     if (features) params.set("features", features);
     params.set("priceMin", priceMin);
@@ -229,22 +171,22 @@ const Home = () => {
                 {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
               <select
-  value={furnishing}
-  onChange={(e) => setFurnishing(e.target.value)}
->
-  <option value="">Furnishing</option>
-  <option value="Furnished">Furnished</option>
-  <option value="Semi Furnished">Semi Furnished</option>
-  <option value="Unfurnished">Unfurnished</option>
-</select>
+                value={furnishing}
+                onChange={(e) => setFurnishing(e.target.value)}
+              >
+                <option value="">Furnishing</option>
+                <option value="Furnished">Furnished</option>
+                <option value="Semi Furnished">Semi Furnished</option>
+                <option value="Unfurnished">Unfurnished</option>
+              </select>
               <select value={beds} onChange={(e) => setBeds(e.target.value)}>
-  <option value="">BHK</option>
-  {BHK_OPTIONS.map((b) => (
-    <option key={b} value={b}>
-      {b}
-    </option>
-  ))}
-</select>
+                <option value="">BHK</option>
+                {BHK_OPTIONS.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <DualRange label="Price Range" unit="₹" min={PRICE_MIN} max={PRICE_MAX} step={500}
@@ -295,7 +237,7 @@ const Home = () => {
               </a>
             </div>
             <div className="rk-hh__plist">
-              {MOCK_PROJECTS.map((p) => (
+              {projects.map((p) => (
                 <ProjectRow key={p._id} project={p} />
               ))}
             </div>

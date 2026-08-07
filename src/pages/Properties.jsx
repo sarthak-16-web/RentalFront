@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
-import { MOCK_PROPERTIES } from "../data/mockProperties";
 import PropertyCard from "../components/PropertyCard";
 import "./Properties.css";
-
-const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial"];
+import { useProperties } from "../hooks/useRentalKingData";
+const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial" , "Warehouse" , "Flats"];
 
 const Properties = () => {
   const [category, setCategory] = useState("");
@@ -11,14 +10,18 @@ const Properties = () => {
   const [minBeds, setMinBeds] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-
-  const locations = useMemo(
-    () => [...new Set(MOCK_PROPERTIES.map((p) => p.location.split(",").pop().trim()))],
-    []
-  );
+   const {
+  data: properties = [],
+  isLoading,
+  isError,
+} = useProperties();
+ const locations = useMemo(
+  () => [...new Set(properties.map((p) => p.location?.split(",").pop()?.trim()))],
+  [properties]
+);
 
   const filtered = useMemo(() => {
-    return MOCK_PROPERTIES.filter((p) => {
+    return properties.filter((p) => {
       if (category && p.category !== category) return false;
       if (location && !p.location.toLowerCase().includes(location.toLowerCase())) return false;
       if (minBeds && (!p.beds || p.beds < Number(minBeds))) return false;

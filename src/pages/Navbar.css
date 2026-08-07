@@ -1,3 +1,4 @@
+
 .rk-navbar {
   position: sticky;
   top: 0;
@@ -367,20 +368,99 @@ MOBILE MENU — FIX
 }
 
 /* Mobile menu */
-.rk-mobile {
-  background: var(--color-white);
-  border-bottom: 1px solid var(--color-line-dark);
-  padding: 10px 24px 18px;
-  display: flex;
-  flex-direction: column;
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+.rk-mobile{
+    background:#fff;
+    border-top:1px solid #eee;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
 }
 
-.rk-mobile__link {
-  padding: 12px 4px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  border-bottom: 1px solid var(--color-slate-200);
-  color: var(--color-ink-900);
+.rk-mobile__link{
+    padding:14px 10px;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:600;
+    color:#1d1d1d;
+    text-decoration:none;
+    transition:.25s;
+}
+
+.rk-mobile__link:hover{
+    background:#f7f7f7;
+    color:#d4a13a;
+}
+
+.rk-mobile__actions{
+    margin-top:18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.rk-cta--block{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    width:100%;
+    height:48px;
+
+    border-radius:12px;
+
+    background:#d4a13a;
+    color:#fff;
+
+    font-size:15px;
+    font-weight:600;
+    text-decoration:none;
+
+    transition:.25s;
+}
+
+.rk-cta--block:hover{
+    background:#bf8d2c;
+}
+
+.rk-whatsapp--block{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    width:100%;
+    height:48px;
+
+    border-radius:12px;
+
+    background:#25D366;
+    color:#fff;
+
+    text-decoration:none;
+    font-size:15px;
+    font-weight:600;
+
+    transition:.25s;
+}
+
+.rk-whatsapp--block:hover{
+    background:#20be5a;
+}
+
+.rk-whatsapp--block svg{
+    width:18px;
+    height:18px;
+}
+
+@media(min-width:960px){
+    .rk-mobile{
+        display:none;
+    }
 }
 
 @media (min-width: 960px) {

@@ -4,6 +4,7 @@ import { useAdminAuth } from "../context/AdminAuthContext";
 import PropertiesManager from "./PropertiesManager";
 import ProjectsManager from "./ProjectsManager";
 import TestimonialsManager from "./TestimonialsManager";
+import { Link } from "react-router-dom";
 import "./AdminDashboard.css";
 
 const TABS = [
@@ -26,10 +27,10 @@ const AdminDashboard = () => {
   return (
     <div className="rk-adash">
       <aside className="rk-adash__sidebar">
-        <div className="rk-adash__brand">
-          Rental<em>King</em>
-          <span>Admin</span>
-        </div>
+       <Link to="/" className="rk-adash__brand">
+  Rental<em>King</em>
+  <span>Admin</span>
+</Link>
 
         <nav className="rk-adash__nav">
           {TABS.map((t) => (

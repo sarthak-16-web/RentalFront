@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import Reveal from "../components/Reveal";
  import heroBuilding from "/imagecopy.png";
 import "./PropertiesHome.css";
-import { useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { useProperties } from "../hooks/useRentalKingData";
 const ArrowIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -11,64 +11,68 @@ const ArrowIcon = () => (
 );
 
 // TEMPORARY mock data — matches propertyModel.js. Swap for /api/properties.
-const MOCK_PROPERTIES = [
-  {
-    _id: "p1",
-    name: "The Aravalli Residence",
-    price: "₹2.4 Cr",
-    location: "Napier Town, Jabalpur",
-    category: "Villa",
-    coverImage: "https://picsum.photos/seed/rk-prop-1/1600/800",
-  },
-  {
-    _id: "p2",
-    name: "Vijay Nagar Heights",
-    price: "₹68 L",
-    location: "Vijay Nagar, Jabalpur",
-    category: "Apartment",
-    coverImage: "https://picsum.photos/seed/rk-prop-2/800/900",
-  },
-  {
-    _id: "p3",
-    name: "Arera Studio",
-    price: "₹42 L",
-    location: "Arera Colony, Jabalpur",
-    category: "Apartment",
-    coverImage: "https://picsum.photos/seed/rk-prop-3/500/900",
-  },
-  {
-    _id: "p4",
-    name: "Central Commerce Plot",
-    price: "₹95 L",
-    location: "Wright Town, Jabalpur",
-    category: "Commercial",
-    coverImage: "https://picsum.photos/seed/rk-prop-4/800/900",
-  },
-  {
-    _id: "p5",
-    name: "Ridge View Bungalow",
-    price: "₹1.6 Cr",
-    location: "Sadar, Jabalpur",
-    category: "House",
-    coverImage: "https://picsum.photos/seed/rk-prop-5/1600/800",
-  },
-  {
-    _id: "p6",
-    name: "Ridge View 1 Bungalow",
-    price: "₹1.6 Cr",
-    location: "Sadar, Jabalpur",
-    category: "House",
-    coverImage: "https://picsum.photos/seed/rk-prop-5/1600/800",
-  },
-];
+// const MOCK_PROPERTIES = [
+//   {
+//     _id: "p1",
+//     name: "The Aravalli Residence",
+//     price: "₹2.4 Cr",
+//     location: "Napier Town, Jabalpur",
+//     category: "Villa",
+//     coverImage: "https://picsum.photos/seed/rk-prop-1/1600/800",
+//   },
+//   {
+//     _id: "p2",
+//     name: "Vijay Nagar Heights",
+//     price: "₹68 L",
+//     location: "Vijay Nagar, Jabalpur",
+//     category: "Apartment",
+//     coverImage: "https://picsum.photos/seed/rk-prop-2/800/900",
+//   },
+//   {
+//     _id: "p3",
+//     name: "Arera Studio",
+//     price: "₹42 L",
+//     location: "Arera Colony, Jabalpur",
+//     category: "Apartment",
+//     coverImage: "https://picsum.photos/seed/rk-prop-3/500/900",
+//   },
+//   {
+//     _id: "p4",
+//     name: "Central Commerce Plot",
+//     price: "₹95 L",
+//     location: "Wright Town, Jabalpur",
+//     category: "Commercial",
+//     coverImage: "https://picsum.photos/seed/rk-prop-4/800/900",
+//   },
+//   {
+//     _id: "p5",
+//     name: "Ridge View Bungalow",
+//     price: "₹1.6 Cr",
+//     location: "Sadar, Jabalpur",
+//     category: "House",
+//     coverImage: "https://picsum.photos/seed/rk-prop-5/1600/800",
+//   },
+//   {
+//     _id: "p6",
+//     name: "Ridge View 1 Bungalow",
+//     price: "₹1.6 Cr",
+//     location: "Sadar, Jabalpur",
+//     category: "House",
+//     coverImage: "https://picsum.photos/seed/rk-prop-5/1600/800",
+//   },
+// ];
 
-const CATEGORY_TAGS = ["All", "Villa", "Apartment", "House", "Commercial"];
+const CATEGORY_TAGS = ["All", "Villa", "Apartment", "House", "Commercial", "Warehouse"];
 
 const PropertyTile = ({ p }) => (
-  <a href={`/properties/${p._id}`} className="rk-ptile">
+  <Link to={`/properties/${p._id}`} className="rk-ptile">
     <div className="rk-ptile__media">
       <span className="heart">♡</span>
-      <img src={p.coverImage} alt={p.name} loading="lazy" />
+      <img
+  src={p.coverImage || "https://placehold.co/600x400?text=No+Image"}
+  alt={p.name}
+  loading="lazy"
+/>
     </div>
     <div className="rk-ptile__caption">
       <div>
@@ -77,24 +81,51 @@ const PropertyTile = ({ p }) => (
       </div>
       <strong>{p.price}</strong>
     </div>
-  </a>
+  </Link>
 );
 
 const PropertiesHome = () => {
   const navigate = useNavigate();
   const [activeTag, setActiveTag] = useState("All");
-
+const {
+  data: properties = [],
+  isLoading,
+  isError,
+} = useProperties();
   const visibleProperties = useMemo(() => {
-    if (activeTag === "All") return MOCK_PROPERTIES;
-    return MOCK_PROPERTIES.filter((p) => p.category === activeTag);
-  }, [activeTag]);
+  let filtered = properties.filter((p) => p.isFeatured);
+
+  if (activeTag !== "All") {
+    filtered = filtered.filter((p) => p.category === activeTag);
+  }
+
+  return filtered;
+}, [properties, activeTag]);
 
   // Duplicate the list so the marquee track can loop seamlessly (0% -> -50%)
   const trackItems = useMemo(
     () => [...visibleProperties, ...visibleProperties],
     [visibleProperties]
   );
+if (isLoading) {
+  return (
+    <section className="rk-prop">
+      <div className="rk-prop__inner">
+        <h2>Loading properties...</h2>
+      </div>
+    </section>
+  );
+}
 
+if (isError) {
+  return (
+    <section className="rk-prop">
+      <div className="rk-prop__inner">
+        <h2>Unable to load properties.</h2>
+      </div>
+    </section>
+  );
+}
   return (
     <>
       {/* ================= HERO ================= */}
@@ -126,9 +157,9 @@ const PropertiesHome = () => {
 
           <Reveal direction="up" delay={200}>
             <div className="rk-hero__actions">
-              <a href="/properties" className="rk-prop__cta">
-                Explore Properties <ArrowIcon />
-              </a>
+             <Link to="/properties" className="rk-prop__cta">
+  Explore Properties <ArrowIcon />
+</Link>
      <a
   href="https://wa.me/+919425959771?text=Hi%20RK%20Estate,%20I'm%20interested%20in%20your%20properties.%20Please%20contact%20me."
   target="_blank"
@@ -148,9 +179,12 @@ const PropertiesHome = () => {
   type="button"
   className={`rk-prop__tag${activeTag === tag ? " is-active" : ""}`}
   onClick={() => {
-    setActiveTag(tag);
-    navigate("/properties");
-  }}
+  navigate("/properties", {
+    state: {
+      category: tag,
+    },
+  });
+}}
 >
   {tag}
 </button>
@@ -194,9 +228,12 @@ const PropertiesHome = () => {
 
           <Reveal direction="up" delay={120}>
             <div className="rk-prop__more">
-              <a href="/properties" className="rk-hero__cta-ghost rk-prop__more-btn">
-                View All Properties <ArrowIcon />
-              </a>
+              <Link
+  to="/featured"
+  className="rk-hero__cta-ghost rk-prop__more-btn"
+>
+  View All Properties <ArrowIcon />
+</Link>
             </div>
           </Reveal>
         </div>
@@ -206,3 +243,4 @@ const PropertiesHome = () => {
 };
 
 export default PropertiesHome;
+  

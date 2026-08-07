@@ -2,6 +2,58 @@
    PROPERTY DETAILS PAGE
 ========================================================== */
 
+.rk-pd__cta{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  padding:14px 18px;
+  margin-top:12px;
+
+  border-radius:10px;
+  font-weight:600;
+  text-decoration:none;
+
+  transition:.25s;
+}
+
+/* Enquire */
+.rk-pd__cta--gold{
+  background:#d7a23a !important;
+  color:#fff !important;
+  border:none !important;
+}
+
+/* WhatsApp */
+.rk-pd__cta--whatsapp{
+  background:#25D366 !important;
+  color:#fff !important;
+  border:none !important;
+}
+
+/* Call */
+.rk-pd__cta--call{
+  background:#ffffff !important;
+  color:#17345f !important;
+  border:2px solid #17345f !important;
+}
+
+.rk-pd__cta--call:hover{
+    background:#13284b;
+    color:#fff;
+    transform:translateY(-2px);
+}
+.rk-pd__cta--whatsapp {
+  background: #25d366;
+  color: #fff;
+  border: none;
+}
+
+.rk-pd__cta--whatsapp:hover {
+  background: #1fa855;
+}
 .rk-pd {
   background: #f8f8f6;
   padding: 40px 24px 90px;

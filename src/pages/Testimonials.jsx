@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { MOCK_TESTIMONIALS } from "../data/mockTestimonials";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTestimonials } from "../hooks/useRentalKingData";
+import apiClient from "../lib/apiClient";
 import "./Testimonials.css";
 
 const StarIcon = ({ filled }) => (
@@ -57,14 +59,15 @@ const Testimonials = () => {
   // Mock mode: new reviews live in local state, merged on top of
   // MOCK_TESTIMONIALS. Once the API is ready, fetch the real list with
   // getAllTestimonials on mount instead, and POST to /add on submit.
-  const [localReviews, setLocalReviews] = useState([]);
+  const queryClient = useQueryClient();
+const { data: allReviews = [] } = useTestimonials();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [hoverRating, setHoverRating] = useState(0);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const allReviews = [...localReviews, ...MOCK_TESTIMONIALS];
+  
 
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -79,7 +82,19 @@ const Testimonials = () => {
     setError("");
   };
 
-  const handleSubmit = async (e) => {
+  
+  const addReviewMutation = useMutation({
+    mutationFn: async (payload) => {
+      const { data } = await apiClient.post("/api/testimonial/add", payload);
+      return data.testimonial;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+      closeForm();
+    },
+  });
+
+const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -94,26 +109,16 @@ const Testimonials = () => {
 
     setSubmitting(true);
 
-    // --- MOCK MODE ---
-    // Replace this block with a real request once the API is ready, e.g.:
-    //
-    // const res = await fetch("/api/testimonials/add", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(form),
-    // });
-    // const data = await res.json();
-    // setLocalReviews((prev) => [data.testimonial, ...prev]);
-
-    const newReview = {
-      _id: `local-${Date.now()}`,
-      ...form,
-      rating: Number(form.rating),
-    };
-    setLocalReviews((prev) => [newReview, ...prev]);
-
-    setSubmitting(false);
-    closeForm();
+    try {
+      await addReviewMutation.mutateAsync({
+        ...form,
+        rating: Number(form.rating),
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to submit review.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

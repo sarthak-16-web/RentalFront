@@ -103,7 +103,7 @@ const STATS = [
   { value: 12, suffix: "+", label: "Builder Partners" },
   { value: 300, suffix: "+", label: "Successful Referrals" },
   { value: 25, suffix: "+", label: "Financial Partners" },
-  { value: 98, suffix: "%", label: "Partner Satisfaction" },
+  { value: 100, suffix: "%", label: "Partner Satisfaction" },
 ];
 
 const COLLAB_TYPES = ["Property Owner", "Builder / Developer", "Real Estate Agent", "Financial Partner"];
