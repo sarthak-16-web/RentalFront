@@ -66,8 +66,17 @@ const DualRange = ({ label, unit, min, max, step, valueMin, valueMax, onChangeMi
   );
 };
 
-const FeaturedCard = ({ property }) => (
-  <div className="rk-fcard">
+const FeaturedCard = ({ property, onOpen }) => (
+  <div
+    className="rk-fcard"
+    onClick={() => onOpen(property)}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") onOpen(property);
+    }}
+    style={{ cursor: "pointer" }}
+  >
     <div className="rk-fcard__image" style={{ backgroundImage: `url(${property.coverImage})` }} />
     <div className="rk-fcard__body">
       <p className="rk-fcard__location"><PinIcon /> {property.location}</p>
@@ -133,6 +142,10 @@ const Home = () => {
     params.set("areaMin", areaMin);
     params.set("areaMax", areaMax);
     navigate(`/properties?${params.toString()}`);
+  };
+
+  const handleOpenProperty = (property) => {
+    navigate(`/properties/${property._id}`);
   };
 
   const scrollByCard = (dir) => {
@@ -226,7 +239,9 @@ const Home = () => {
             )}
 
             {!loading &&
-              featured.map((p) => <FeaturedCard key={p._id} property={p} />)}
+              featured.map((p) => (
+                <FeaturedCard key={p._id} property={p} onOpen={handleOpenProperty} />
+              ))}
           </div>
 
           <div className="rk-hh__upcoming">
@@ -237,7 +252,7 @@ const Home = () => {
               </a>
             </div>
             <div className="rk-hh__plist">
-              {projects.map((p) => (
+              {projects.slice(0, 1).map((p) => (
                 <ProjectRow key={p._id} project={p} />
               ))}
             </div>
