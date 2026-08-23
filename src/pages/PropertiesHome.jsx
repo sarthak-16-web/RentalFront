@@ -196,10 +196,6 @@ if (isError) {
             </div>
           </Reveal>
         </div>
-
-        <div className="rk-hero__scrollcue" aria-hidden="true">
-          <span />
-        </div>
       </section>
 
       {/* ================= LISTINGS ================= */}

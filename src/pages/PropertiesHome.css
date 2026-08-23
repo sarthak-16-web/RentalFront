@@ -118,36 +118,6 @@
     color:#111;
 }
 
-.rk-hero__scrollcue{
-    position:absolute;
-    left:50%;
-    bottom:28px;
-    transform:translateX(-50%);
-    z-index:2;
-    width:26px;
-    height:42px;
-    border:2px solid rgba(255,255,255,.5);
-    border-radius:999px;
-}
-
-.rk-hero__scrollcue span{
-    position:absolute;
-    top:8px;
-    left:50%;
-    width:4px;
-    height:8px;
-    margin-left:-2px;
-    border-radius:999px;
-    background:#fff;
-    animation:rk-scroll-cue 1.8s ease infinite;
-}
-
-@keyframes rk-scroll-cue{
-    0%{ transform:translateY(0); opacity:1; }
-    70%{ transform:translateY(14px); opacity:0; }
-    100%{ transform:translateY(0); opacity:0; }
-}
-
 @media(max-width:700px){
 
 .rk-hero{
@@ -160,10 +130,6 @@
 
 .rk-hero__heading{
     max-width:none;
-}
-
-.rk-hero__scrollcue{
-    display:none;
 }
 
 }
