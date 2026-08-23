@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { formatPrice } from "../lib/priceFormat";
 import "./PropertyCard.css";
 
 const BedIcon = () => (
@@ -44,7 +45,9 @@ const PropertyCard = ({ property }) => {
         <h4>{property.name}</h4>
 
         <div className="rk-pcard__meta">
-          <span className="rk-pcard__price">{property.price}</span>
+          <span className="rk-pcard__price">
+            {formatPrice(property.priceNumeric, property.status, property.priceFrequency)}
+          </span>
 
           <span className="rk-pcard__specs">
             {property.beds && (

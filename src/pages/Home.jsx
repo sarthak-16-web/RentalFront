@@ -4,6 +4,7 @@ import { useProperties, useProjects } from "../hooks/useRentalKingData";
 import FacetSelect from "../components/FacetSelect";
 import { matches, repairSelections } from "../lib/facetSelections";
 import { parseArea, computeSpan } from "../lib/ranges";
+import { formatPrice } from "../lib/priceFormat";
 import ReadOnlyRange from "../components/ReadOnlyRange";
 import "./Home.css";
 
@@ -42,7 +43,7 @@ const FeaturedCard = ({ property }) => (
       <p className="rk-fcard__location"><PinIcon /> {property.location}</p>
       <h4>{property.name}</h4>
       <div className="rk-fcard__meta">
-        <span>{property.price}</span>
+        <span>{formatPrice(property.priceNumeric, property.status, property.priceFrequency)}</span>
         {property.beds ? <span><BedIcon /> {property.beds} bed</span> : null}
       </div>
     </div>

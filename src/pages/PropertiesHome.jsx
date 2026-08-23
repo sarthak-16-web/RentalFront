@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useProperties } from "../hooks/useRentalKingData";
 import { useContacts } from "../hooks/useContacts";
 import { contactLinks } from "../lib/contactLinks";
+import { formatPrice } from "../lib/priceFormat";
 const ArrowIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -81,7 +82,7 @@ const PropertyTile = ({ p }) => (
         <h4>{p.name}</h4>
         <span>{p.location}</span>
       </div>
-      <strong>{p.price}</strong>
+      <strong>{formatPrice(p.priceNumeric, p.status, p.priceFrequency)}</strong>
     </div>
   </Link>
 );

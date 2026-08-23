@@ -6,6 +6,7 @@ import {
   deleteProperty,
   getPropertySchema,
 } from "../api/adminResourceApi";
+import { formatPrice } from "../lib/priceFormat";
 import "./AdminManager.css";
 
 const emptySchema = {
@@ -13,12 +14,14 @@ const emptySchema = {
   statusesByCategory: {},
   furnishingByCategory: {},
   bhkByCategory: {},
+  priceFrequencies: [],
+  priceFrequencyStatuses: [],
 };
 
 const baseForm = {
   name: "",
-  price: "",
   priceNumeric: "",
+  priceFrequency: "",
   location: "",
   address: "",
   category: "",
@@ -46,6 +49,13 @@ const repairDependentFields = (schema, category, current) => {
     furnishing: furnishings.includes(current.furnishing) ? current.furnishing : furnishings[0] || "",
     bhk: bhks.includes(current.bhk) ? current.bhk : bhks[0] || "",
   };
+};
+
+// Price frequency only applies to statuses that bill recurringly (e.g. "For
+// Rent"); everything else should have it cleared entirely.
+const repairPriceFrequency = (schema, status, current) => {
+  if (!schema.priceFrequencyStatuses.includes(status)) return "";
+  return schema.priceFrequencies.includes(current) ? current : schema.priceFrequencies[0] || "";
 };
 
 const PropertiesManager = ({ featuredOnly }) => {
@@ -95,10 +105,12 @@ const PropertiesManager = ({ featuredOnly }) => {
 
   const openAddForm = () => {
     const category = schema.categories[0] || "";
+    const dependent = repairDependentFields(schema, category, { status: "", furnishing: "", bhk: "" });
     setForm({
       ...baseForm,
       category,
-      ...repairDependentFields(schema, category, { status: "", furnishing: "", bhk: "" }),
+      ...dependent,
+      priceFrequency: repairPriceFrequency(schema, dependent.status, ""),
     });
     setEditingId(null);
     setShowForm(true);
@@ -106,18 +118,19 @@ const PropertiesManager = ({ featuredOnly }) => {
 
   const openEditForm = (p) => {
     const category = p.category || schema.categories[0] || "";
+    const dependent = repairDependentFields(schema, category, {
+      status: p.status || "",
+      furnishing: p.furnishing || "",
+      bhk: p.bhk || "",
+    });
     setForm({
       name: p.name || "",
-      price: p.price || "",
       priceNumeric: p.priceNumeric ?? "",
+      priceFrequency: repairPriceFrequency(schema, dependent.status, p.priceFrequency || ""),
       location: p.location || "",
       address: p.address || "",
       category,
-      ...repairDependentFields(schema, category, {
-        status: p.status || "",
-        furnishing: p.furnishing || "",
-        bhk: p.bhk || "",
-      }),
+      ...dependent,
       coverImage: p.coverImage || "",
       images: (p.images || []).join(", "),
       beds: p.beds ?? "",
@@ -133,7 +146,17 @@ const PropertiesManager = ({ featuredOnly }) => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (name === "category") {
-      setForm((f) => ({ ...f, category: value, ...repairDependentFields(schema, value, f) }));
+      setForm((f) => {
+        const dependent = repairDependentFields(schema, value, f);
+        return {
+          ...f,
+          category: value,
+          ...dependent,
+          priceFrequency: repairPriceFrequency(schema, dependent.status, f.priceFrequency),
+        };
+      });
+    } else if (name === "status") {
+      setForm((f) => ({ ...f, status: value, priceFrequency: repairPriceFrequency(schema, value, f.priceFrequency) }));
     } else {
       setForm((f) => ({ ...f, [name]: type === "checkbox" ? checked : value }));
     }
@@ -145,17 +168,22 @@ const PropertiesManager = ({ featuredOnly }) => {
     setError("");
     setSuccess("");
 
+    // Explicit null (not an omitted key) tells the backend to clear a field
+    // that doesn't apply to this category/status - an omitted key means
+    // "don't touch this", which matters for partial updates like toggling
+    // isFeatured.
     const payload = {
       ...form,
       priceNumeric: Number(form.priceNumeric),
+      furnishing: form.furnishing || null,
+      bhk: form.bhk || null,
+      priceFrequency: form.priceFrequency || null,
       beds: form.beds ? Number(form.beds) : undefined,
       baths: form.baths ? Number(form.baths) : undefined,
       images: form.images
         ? form.images.split(",").map((s) => s.trim()).filter(Boolean)
         : [],
     };
-    if (!payload.furnishing) delete payload.furnishing;
-    if (!payload.bhk) delete payload.bhk;
 
     try {
       if (editingId) {
@@ -258,13 +286,28 @@ const PropertiesManager = ({ featuredOnly }) => {
 
           <div className="rk-amgr__row rk-amgr__row--2">
             <div className="rk-amgr__field">
-              <label>Price (display text)</label>
-              <input name="price" required placeholder="₹45,000/month" value={form.price} onChange={handleChange} />
+              <label>Price</label>
+              <div className="rk-amgr__prefixed-input">
+                <span>₹</span>
+                <input
+                  name="priceNumeric"
+                  type="number"
+                  required
+                  min="0"
+                  value={form.priceNumeric}
+                  onChange={handleChange}
+                  placeholder="45000"
+                />
+              </div>
             </div>
-            <div className="rk-amgr__field">
-              <label>Price (numeric)</label>
-              <input name="priceNumeric" type="number" required value={form.priceNumeric} onChange={handleChange} />
-            </div>
+            {schema.priceFrequencyStatuses.includes(form.status) && (
+              <div className="rk-amgr__field">
+                <label>Frequency</label>
+                <select name="priceFrequency" required value={form.priceFrequency} onChange={handleChange}>
+                  {schema.priceFrequencies.map((f) => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="rk-amgr__row rk-amgr__row--2">
@@ -349,7 +392,7 @@ const PropertiesManager = ({ featuredOnly }) => {
                   <td><img src={p.coverImage} alt={p.name} className="rk-amgr__thumb" /></td>
                   <td>{p.name}<br /><span className="rk-amgr__badge">{p.location}</span></td>
                   <td><span className="rk-amgr__badge">{p.category}</span></td>
-                  <td>{p.price}</td>
+                  <td>{formatPrice(p.priceNumeric, p.status, p.priceFrequency)}</td>
                   <td>
                     <button
                       className={`rk-amgr__badge ${p.isFeatured ? "rk-amgr__badge--gold" : ""}`}
