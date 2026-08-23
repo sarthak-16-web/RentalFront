@@ -23,7 +23,6 @@ import ContactUs from "./pages/Contactus";
 import Collaboration from "./pages/Collaboration";
 import TeamMemberDetails from "./pages/Teammemberdetails";
 import UpcomingProjects from "./pages/Upcomingprojects";
-import FeaturedProperties from "./pages/FeaturedProperties";
 import Legalpage from "./pages/Legalpage";
 
 // Admin Pages
@@ -127,17 +126,6 @@ function App() {
               <>
                 <Navbar />
                 <UpcomingProjects />
-                <Fotter />
-              </>
-            }
-          />
-
-          <Route
-            path="/featured"
-            element={
-              <>
-                <Navbar />
-                <FeaturedProperties />
                 <Fotter />
               </>
             }

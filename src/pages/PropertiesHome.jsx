@@ -185,7 +185,7 @@ if (isError) {
 </Link>
      {links && (
      <a
-  href={links.waText("Hi RK Estate, I'm interested in your properties. Please contact me.")}
+  href={links.waText("Hi Rental King, I'm interested in your properties. Please contact me.")}
   target="_blank"
   rel="noopener noreferrer"
   className="rk-hero__cta-ghost"
@@ -264,7 +264,7 @@ if (isError) {
           <Reveal direction="up" delay={120}>
             <div className="rk-prop__more">
               <Link
-  to="/featured"
+  to="/properties?featured=1"
   className="rk-hero__cta-ghost rk-prop__more-btn"
 >
   View All Properties <ArrowIcon />

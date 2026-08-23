@@ -53,7 +53,6 @@ const WhatsappIcon = () => (
 const NAV_LINKS = [
   { label: "Home", to: "/" },
   { label: "Properties", to: "/properties" },
-  { label: "Featured", to: "/featured" },
   { label: "Upcoming", to: "/upcoming" },
   { label: "Testimonials", to: "/testimonials" },
 ];
