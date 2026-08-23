@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
 import "./Collaboration.css";
 
 /* ----------------------------------------------------------------
@@ -8,9 +10,7 @@ import "./Collaboration.css";
    sent automatically from here, so no backend / EmailJS needed.
 ------------------------------------------------------------------- */
 
-const WHATSAPP_NUMBER = "919300653927"; // country code + number, no + or spaces
-
-const buildWhatsappLink = (form) => {
+const buildWhatsappLink = (links, form) => {
   const text =
     `New Partner Inquiry\n\n` +
     `Name/Company: ${form.name}\n` +
@@ -18,7 +18,7 @@ const buildWhatsappLink = (form) => {
     `Phone: ${form.phone}\n` +
     `Email: ${form.email}\n` +
     `Message: ${form.message}`;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  return links.waText(text);
 };
 
 /* ---------- Icons ---------- */
@@ -140,6 +140,8 @@ const StatItem = ({ value, suffix, label, active }) => {
 const Collaboration = () => {
   const statsRef = useRef(null);
   const [statsActive, setStatsActive] = useState(false);
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
 
   useEffect(() => {
     const node = statsRef.current;
@@ -167,7 +169,8 @@ const Collaboration = () => {
     e.preventDefault();
     // Open WhatsApp with the message pre-filled. User still has to
     // hit Send inside WhatsApp themselves.
-    window.open(buildWhatsappLink(form), "_blank", "noopener,noreferrer");
+    if (!links?.wa) return;
+    window.open(buildWhatsappLink(links, form), "_blank", "noopener,noreferrer");
     setSubmitted(true);
     setForm(EMPTY_FORM);
   };

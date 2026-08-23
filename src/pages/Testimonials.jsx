@@ -85,7 +85,7 @@ const { data: allReviews = [] } = useTestimonials();
   
   const addReviewMutation = useMutation({
     mutationFn: async (payload) => {
-      const { data } = await apiClient.post("/api/testimonial/add", payload);
+      const { data } = await apiClient.post("/testimonial/add", payload);
       return data.testimonial;
     },
     onSuccess: () => {

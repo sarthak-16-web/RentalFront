@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
 import "./Legalpage.css";
 import AccordionSection from "./Accordionsection";
 
@@ -359,6 +361,8 @@ const DEFAULT_OPEN_IDS = ["privacy-overview"];
 
 const LegalPage = () => {
   const [openIds, setOpenIds] = useState(() => new Set(DEFAULT_OPEN_IDS));
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
 
   const toggleSection = (id) => {
     setOpenIds((prev) => {
@@ -439,8 +443,8 @@ const LegalPage = () => {
             <h3>Questions about any of this?</h3>
             <p>Reach our team any time — we usually reply within one business day.</p>
             <div className="rk-legal__contact-links">
-              <a href="mailto:rentalking101@gmail.com">rentalking101@gmail.com</a>
-              <a href="tel:+919300653927">+91 93006 53927</a>
+              {links?.mailto && <a href={links.mailto}>{contacts.email}</a>}
+              {links?.tel && <a href={links.tel}>{contacts.phone}</a>}
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ import "./AdminLogin.css";
 const AdminLogin = () => {
   const { login } = useAdminAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,10 +16,17 @@ const AdminLogin = () => {
     setError("");
     setLoading(true);
     try {
-      await login(email, password);
+      await login(username, password);
       navigate("/admin");
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password");
+      const status = err.response?.status;
+      if (status === 401) {
+        setError(err.response?.data?.message || "Invalid username or password");
+      } else if (!err.response) {
+        setError("Unable to reach the server. Please try again later.");
+      } else {
+        setError("Login service error — please try again later.");
+      }
     } finally {
       setLoading(false);
     }
@@ -34,14 +41,14 @@ const AdminLogin = () => {
         {error && <div className="rk-alogin__error">{error}</div>}
 
         <div className="rk-alogin__field">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="username">Username</label>
           <input
-            id="email"
-            type="email"
+            id="username"
+            type="text"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin@rentalking.com"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="admin"
           />
         </div>
 

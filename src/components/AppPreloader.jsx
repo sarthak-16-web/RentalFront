@@ -22,7 +22,7 @@ const AppPreloader = () => {
         const properties = await queryClient.ensureQueryData({
           queryKey: ["properties"],
           queryFn: async () => {
-            const { data } = await apiClient.get("/api/property/get-all");
+            const { data } = await apiClient.get("/property/get-all");
             return data.properties ?? [];
           },
         });
@@ -42,7 +42,7 @@ const AppPreloader = () => {
         const projects = await queryClient.ensureQueryData({
           queryKey: ["projects"],
           queryFn: async () => {
-            const { data } = await apiClient.get("/api/project/get-all");
+            const { data } = await apiClient.get("/project/get-all");
             return data.projects ?? [];
           },
         });
@@ -58,7 +58,7 @@ const AppPreloader = () => {
         const testimonials = await queryClient.ensureQueryData({
           queryKey: ["testimonials"],
           queryFn: async () => {
-            const { data } = await apiClient.get("/api/testimonial/get-all");
+            const { data } = await apiClient.get("/testimonial/get-all");
             return data.testimonials ?? [];
           },
         });

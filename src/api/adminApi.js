@@ -1,21 +1,21 @@
 import api from "./axios";
 
-export const loginAdmin = async (email, password) => {
-  const res = await api.post("/api/admin/login", { email, password });
+export const loginAdmin = async (username, password) => {
+  const res = await api.post("/admin/login", { username, password });
   return res.data;
 };
 
 export const logoutAdmin = async () => {
-  const res = await api.post("/api/admin/logout");
+  const res = await api.post("/admin/logout");
   return res.data;
 };
 
 export const checkAdminSession = async () => {
-  const res = await api.get("/api/admin/me");
+  const res = await api.get("/admin/me");
   return res.data;
 };
 
 export const refreshAccessToken = async () => {
-  const res = await api.post("/api/admin/refresh");
+  const res = await api.post("/admin/refresh");
   return res.data;
 };

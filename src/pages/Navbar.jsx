@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
 import "./Navbar.css";
 
 const PhoneIcon = () => (
@@ -62,12 +64,12 @@ const COMPANY_LINKS = [
   { label: "Contact & Support", to: "/contact" },
 ];
 
-const WHATSAPP_NUMBER = "919300653927"; // update with your actual WhatsApp number (no + or spaces)
-
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [companyOpen, setCompanyOpen] = useState(false);
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -81,14 +83,18 @@ const Navbar = () => {
       <div className="rk-topbar">
         <div className="rk-topbar__inner">
           <div className="rk-topbar__contact">
-            <a href="tel:+911234567890">
-              <PhoneIcon /> <span>+91 93006 53927</span>
-            </a>
-            <a href="mailto:hello@rentalking.com">
-              <MailIcon /> <span>rentalking101@gmail.com</span>
-            </a>
+            {links?.tel && (
+              <a href={links.tel}>
+                <PhoneIcon /> <span>{contacts.phone}</span>
+              </a>
+            )}
+            {links?.mailto && (
+              <a href={links.mailto}>
+                <MailIcon /> <span>{contacts.email}</span>
+              </a>
+            )}
           </div>
-          <p className="rk-topbar__tagline">Homes and spaces, matched right.</p>
+          <p className="rk-topbar__tagline">Your trusted real estate partner!</p>
         </div>
       </div>
 
@@ -142,15 +148,17 @@ const Navbar = () => {
               Enquire Now
             </Link>
 
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rk-whatsapp"
-              aria-label="Chat on WhatsApp"
-            >
-              <WhatsappIcon />
-            </a>
+            {links?.wa && (
+              <a
+                href={links.wa}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rk-whatsapp"
+                aria-label="Chat on WhatsApp"
+              >
+                <WhatsappIcon />
+              </a>
+            )}
           </div>
 
           <button
@@ -175,16 +183,18 @@ const Navbar = () => {
             <Link to="/contact" onClick={() => setMobileOpen(false)} className="rk-cta rk-cta--block">
               Enquire Now
             </Link>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rk-whatsapp rk-whatsapp--block"
-              aria-label="Chat on WhatsApp"
-            >
-              <WhatsappIcon />
-              <span>Chat on WhatsApp</span>
-            </a>
+            {links?.wa && (
+              <a
+                href={links.wa}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rk-whatsapp rk-whatsapp--block"
+                aria-label="Chat on WhatsApp"
+              >
+                <WhatsappIcon />
+                <span>Chat on WhatsApp</span>
+              </a>
+            )}
           </div>
         </div>
       )}

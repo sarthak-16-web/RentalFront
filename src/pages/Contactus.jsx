@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
 import "./Contactus.css";
 
 /* ----------------------------------------------------------------
@@ -8,9 +10,7 @@ import "./Contactus.css";
    sent automatically from here, so no backend / EmailJS needed.
 ------------------------------------------------------------------- */
 
-const WHATSAPP_NUMBER = "919300653927"; // country code + number, no + or spaces
-
-const buildWhatsappLink = (form) => {
+const buildWhatsappLink = (links, form) => {
   const text =
     `New Contact Form Submission\n\n` +
     `Name: ${form.name}\n` +
@@ -18,7 +18,7 @@ const buildWhatsappLink = (form) => {
     `Email: ${form.email}\n` +
     `Subject: ${form.subject}\n` +
     `Message: ${form.message}`;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  return links.waText(text);
 };
 
 const EMPTY_FORM = { name: "", email: "", phone: "", subject: "", message: "" };
@@ -58,18 +58,20 @@ const SendIcon = () => (
   </svg>
 );
 
-const INFO_CARDS = [
-  { icon: PhoneIcon, label: "Call Us", value: "+91 93006 53927", href: "tel:+919300653927" },
-  { icon: MailIcon, label: "Email Us", value: "rentalking101@gmail.com", href: "rentalking101.com" },
-  { icon: PinIcon, label: "Visit Us", value: "211,NRK BIZ PARK,PU 4, Behind C21 mall, Indore", href: null },
-  { icon: ClockIcon, label: "Office Hours", value: "Mon – Sat, 9:00 AM – 7:00 PM", href: null },
-];
-
 const SUBJECTS = ["General Inquiry", "Property Enquiry", "List a Property", "Support"];
 
 const ContactUs = () => {
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
+
+  const INFO_CARDS = [
+    { icon: PhoneIcon, label: "Call Us", value: contacts?.phone ?? null, href: links?.tel ?? null },
+    { icon: MailIcon, label: "Email Us", value: contacts?.email ?? null, href: links?.mailto ?? null },
+    { icon: PinIcon, label: "Visit Us", value: contacts?.address ?? null, href: null },
+    { icon: ClockIcon, label: "Office Hours", value: "Mon – Sat, 9:00 AM – 7:00 PM", href: null },
+  ];
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -77,9 +79,10 @@ const ContactUs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!links?.wa) return;
     // Open WhatsApp with the message pre-filled. User still has to
     // hit Send inside WhatsApp themselves.
-    window.open(buildWhatsappLink(form), "_blank", "noopener,noreferrer");
+    window.open(buildWhatsappLink(links, form), "_blank", "noopener,noreferrer");
     setSubmitted(true);
     setForm(EMPTY_FORM);
   };
@@ -114,7 +117,7 @@ const ContactUs = () => {
         <div className="rk-contact__grid">
           {/* Left: info cards */}
           <div className="rk-contact__info">
-            {INFO_CARDS.map((c) => {
+            {INFO_CARDS.filter((c) => c.value).map((c) => {
               const Icon = c.icon;
               const content = (
                 <>

@@ -4,6 +4,7 @@ import { useAdminAuth } from "../context/AdminAuthContext";
 import PropertiesManager from "./PropertiesManager";
 import ProjectsManager from "./ProjectsManager";
 import TestimonialsManager from "./TestimonialsManager";
+import ContactSettings from "./ContactSettings";
 import { Link } from "react-router-dom";
 import "./AdminDashboard.css";
 
@@ -12,6 +13,7 @@ const TABS = [
   { key: "featured", label: "Featured Properties" },
   { key: "projects", label: "Upcoming Projects" },
   { key: "testimonials", label: "Testimonials" },
+  { key: "contacts", label: "Contact Details" },
 ];
 
 const AdminDashboard = () => {
@@ -45,7 +47,7 @@ const AdminDashboard = () => {
         </nav>
 
         <div className="rk-adash__footer">
-          <p>{admin?.email}</p>
+          <p>{admin?.username}</p>
           <button onClick={handleLogout}>Log Out</button>
         </div>
       </aside>
@@ -55,6 +57,7 @@ const AdminDashboard = () => {
         {activeTab === "featured" && <PropertiesManager featuredOnly={true} />}
         {activeTab === "projects" && <ProjectsManager />}
         {activeTab === "testimonials" && <TestimonialsManager />}
+        {activeTab === "contacts" && <ContactSettings />}
       </main>
     </div>
   );

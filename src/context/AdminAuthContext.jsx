@@ -22,8 +22,8 @@ export const AdminAuthProvider = ({ children }) => {
     checkSession();
   }, []);
 
-  const login = async (email, password) => {
-    const data = await loginAdmin(email, password);
+  const login = async (username, password) => {
+    const data = await loginAdmin(username, password);
     setAdmin(data.admin);
     return data;
   };

@@ -4,6 +4,8 @@ import Reveal from "../components/Reveal";
 import "./PropertiesHome.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useProperties } from "../hooks/useRentalKingData";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
 const ArrowIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -87,6 +89,8 @@ const PropertyTile = ({ p }) => (
 const PropertiesHome = () => {
   const navigate = useNavigate();
   const [activeTag, setActiveTag] = useState("All");
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
 const {
   data: properties = [],
   isLoading,
@@ -160,14 +164,16 @@ if (isError) {
              <Link to="/properties" className="rk-prop__cta">
   Explore Properties <ArrowIcon />
 </Link>
+     {links && (
      <a
-  href="https://wa.me/+919425959771?text=Hi%20RK%20Estate,%20I'm%20interested%20in%20your%20properties.%20Please%20contact%20me."
+  href={links.waText("Hi RK Estate, I'm interested in your properties. Please contact me.")}
   target="_blank"
   rel="noopener noreferrer"
   className="rk-hero__cta-ghost"
 >
   Talk To An Advisor
 </a>
+)}
             </div>
           </Reveal>
 

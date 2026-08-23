@@ -10,7 +10,7 @@ export const useProperties = () =>
     queryKey: ["properties"],
 
     queryFn: async () => {
-      const { data } = await apiClient.get("/api/property/get-all");
+      const { data } = await apiClient.get("/property/get-all");
       return data.properties ?? [];
     },
   });
@@ -39,7 +39,7 @@ export const useProperty = (id) => {
       }
 
       // Direct URL access fallback
-      const { data } = await apiClient.get(`/api/property/${id}`);
+      const { data } = await apiClient.get(`/property/${id}`);
 
       return data.property;
     },
@@ -57,7 +57,7 @@ export const useProjects = () =>
     queryKey: ["projects"],
 
     queryFn: async () => {
-      const { data } = await apiClient.get("/api/project/get-all");
+      const { data } = await apiClient.get("/project/get-all");
       return data.projects ?? [];
     },
   });
@@ -71,7 +71,7 @@ export const useTestimonials = () =>
     queryKey: ["testimonials"],
 
     queryFn: async () => {
-      const { data } = await apiClient.get("/api/testimonial/get-all");
+      const { data } = await apiClient.get("/testimonial/get-all");
       return data.testimonials ?? [];
     },
   });
