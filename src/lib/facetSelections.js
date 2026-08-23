@@ -1,5 +1,20 @@
 export const FACET_DIMS = ["location", "category", "status", "furnishing", "bhk"];
 
+// Sorts values by their position in a reference order (e.g. the backend
+// schema's category list), falling back to alphabetical for anything not
+// found in it - covers the "schema hasn't loaded yet" case gracefully.
+export const sortByOrder = (values, order) => {
+  if (!order?.length) return [...values].sort();
+  return [...values].sort((a, b) => {
+    const ai = order.indexOf(a);
+    const bi = order.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+};
+
 export const cityOf = (p) => p.location?.split(",").pop()?.trim();
 
 export const matches = (p, sel) => {

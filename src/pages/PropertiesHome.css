@@ -238,6 +238,12 @@
     color:#fff;
 }
 
+.rk-prop__tag.is-active{
+    background:#c89b3c;
+    border-color:#c89b3c;
+    color:#111;
+}
+
 .rk-prop__cta{
     display:inline-flex;
     align-items:center;

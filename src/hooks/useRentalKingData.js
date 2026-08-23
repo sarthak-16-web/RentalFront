@@ -16,6 +16,22 @@ export const useProperties = () =>
   });
 
 // =======================
+// Property Schema
+// =======================
+
+export const usePropertySchema = () =>
+  useQuery({
+    queryKey: ["propertySchema"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/property/schema");
+      return data;
+    },
+
+    staleTime: 5 * 60 * 1000,
+  });
+
+// =======================
 // Single Property
 // =======================
 

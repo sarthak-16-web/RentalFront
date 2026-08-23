@@ -3,10 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import PropertyCard from "../components/PropertyCard";
 import FacetSelect from "../components/FacetSelect";
 import DualRange from "../components/DualRange";
-import { repairSelections, cityOf } from "../lib/facetSelections";
+import { repairSelections, cityOf, sortByOrder } from "../lib/facetSelections";
 import { parseArea, computeSpan } from "../lib/ranges";
 import "./Properties.css";
-import { useProperties } from "../hooks/useRentalKingData";
+import { useProperties, usePropertySchema } from "../hooks/useRentalKingData";
 
 const EMPTY_FILTERS = {
   location: [],
@@ -54,6 +54,7 @@ const Properties = () => {
     isLoading,
     isError,
   } = useProperties();
+  const { data: schema } = usePropertySchema();
 
   const filterList = (list, f) => {
     return list.filter((p) => {
@@ -81,8 +82,8 @@ const Properties = () => {
     [properties, filters]
   );
   const categoryOptions = useMemo(
-    () => distinct(filterList(properties, { ...filters, category: [] }), (p) => p.category),
-    [properties, filters]
+    () => sortByOrder(distinct(filterList(properties, { ...filters, category: [] }), (p) => p.category), schema?.categories),
+    [properties, filters, schema]
   );
   const statusOptions = useMemo(
     () => distinct(filterList(properties, { ...filters, status: [] }), (p) => p.status),

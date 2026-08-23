@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProperties, useProjects } from "../hooks/useRentalKingData";
+import { useProperties, useProjects, usePropertySchema } from "../hooks/useRentalKingData";
 import FacetSelect from "../components/FacetSelect";
-import { matches, repairSelections } from "../lib/facetSelections";
+import { matches, repairSelections, sortByOrder } from "../lib/facetSelections";
 import { parseArea, computeSpan } from "../lib/ranges";
 import { formatPrice } from "../lib/priceFormat";
 import ReadOnlyRange from "../components/ReadOnlyRange";
@@ -74,6 +74,7 @@ const Home = () => {
   // Real data — cached by React Query, no refetch on every page switch.
   const { data: properties = [], isLoading: propertiesLoading } = useProperties();
   const { data: projects = [] } = useProjects();
+  const { data: schema } = usePropertySchema();
 
   const featured = properties.filter((p) => p.isFeatured);
   const loading = propertiesLoading;
@@ -108,8 +109,8 @@ const Home = () => {
     [properties, location, category, status, furnishing, beds]
   );
   const categories = useMemo(
-    () => [...new Set(properties.filter((p) => matches(p, { ...selected, category: [] })).map((p) => p.category).filter(Boolean))].sort(),
-    [properties, location, category, status, furnishing, beds]
+    () => sortByOrder([...new Set(properties.filter((p) => matches(p, { ...selected, category: [] })).map((p) => p.category).filter(Boolean))], schema?.categories),
+    [properties, location, category, status, furnishing, beds, schema]
   );
   const statuses = useMemo(
     () => [...new Set(properties.filter((p) => matches(p, { ...selected, status: [] })).map((p) => p.status).filter(Boolean))].sort(),
