@@ -103,7 +103,7 @@ const Navbar = () => {
           <Link to="/" className="rk-logo" onClick={() => setMobileOpen(false)}>
            <img
   src={"logo.jpeg"}
-  alt="Rental King"
+  alt="RentalKing"
   className="rk-logo__img"
 />
             <span className="rk-logo__text">

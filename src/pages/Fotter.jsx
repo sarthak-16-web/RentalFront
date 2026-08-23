@@ -58,7 +58,7 @@ const Footer = () => {
              
                <img
   src={"logo.jpeg"}
-  alt="Rental King"
+  alt="RentalKing"
   className="rk-logo__img"
 />
               RentalKing

@@ -156,7 +156,7 @@ if (isError) {
         <img
           className="rk-hero__img"
           src={heroBuilding}
-          alt="RK Estates flagship commercial tower at dusk"
+          alt="RentalKing flagship commercial tower at dusk"
         />
         <div className="rk-hero__scrim" />
 
@@ -185,7 +185,7 @@ if (isError) {
 </Link>
      {links && (
      <a
-  href={links.waText("Hi Rental King, I'm interested in your properties. Please contact me.")}
+  href={links.waText("Hi RentalKing, I'm interested in your properties. Please contact me.")}
   target="_blank"
   rel="noopener noreferrer"
   className="rk-hero__cta-ghost"
