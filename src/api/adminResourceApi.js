@@ -5,6 +5,10 @@ export const getAllProperties = async () => {
   const res = await api.get("/property/get-all");
   return res.data.properties;
 };
+export const getPropertySchema = async () => {
+  const res = await api.get("/property/schema");
+  return res.data;
+};
 export const addProperty = async (data) => {
   const res = await api.post("/property/add", data);
   return res.data;

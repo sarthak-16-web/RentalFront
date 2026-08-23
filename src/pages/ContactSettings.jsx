@@ -4,6 +4,16 @@ import "./AdminManager.css";
 
 const emptyForm = { phone: "", whatsapp: "", email: "", address: "" };
 
+// Both phone and whatsapp are stored with a leading "91" country code; the
+// admin only ever types the 10-digit local number, so strip it back off for
+// editing and re-add it (in the right shape) on save.
+const last10Digits = (value) => (value || "").replace(/\D/g, "").slice(-10);
+
+const formatPhone = (digits10) =>
+  digits10.length === 10 ? `+91 ${digits10.slice(0, 5)} ${digits10.slice(5)}` : "";
+
+const formatWhatsapp = (digits10) => (digits10.length === 10 ? `91${digits10}` : "");
+
 const ContactSettings = () => {
   const { data: contacts, isLoading } = useContacts();
   const updateContacts = useUpdateContacts();
@@ -15,22 +25,37 @@ const ContactSettings = () => {
   useEffect(() => {
     if (contacts) {
       setForm({
-        phone: contacts.phone || "",
-        whatsapp: contacts.whatsapp || "",
+        phone: last10Digits(contacts.phone),
+        whatsapp: last10Digits(contacts.whatsapp),
         email: contacts.email || "",
         address: contacts.address || "",
       });
     }
   }, [contacts]);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "phone" || name === "whatsapp") {
+      setForm({ ...form, [name]: value.replace(/\D/g, "").slice(0, 10) });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    if (form.phone.length !== 10) return setError("Phone must be a 10-digit number.");
+    if (form.whatsapp.length !== 10) return setError("WhatsApp must be a 10-digit number.");
+
     try {
-      await updateContacts.mutateAsync(form);
+      await updateContacts.mutateAsync({
+        ...form,
+        phone: formatPhone(form.phone),
+        whatsapp: formatWhatsapp(form.whatsapp),
+      });
       setSuccess("Contact details saved. They are live across the site.");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
@@ -57,12 +82,36 @@ const ContactSettings = () => {
 
           <div className="rk-amgr__row rk-amgr__row--2">
             <div className="rk-amgr__field">
-              <label>Phone (display format)</label>
-              <input name="phone" required value={form.phone} onChange={handleChange} placeholder="+91 93006 53927" />
+              <label>Phone</label>
+              <div className="rk-amgr__prefixed-input">
+                <span>+91</span>
+                <input
+                  name="phone"
+                  required
+                  inputMode="numeric"
+                  pattern="\d{10}"
+                  maxLength={10}
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="9300653927"
+                />
+              </div>
             </div>
             <div className="rk-amgr__field">
-              <label>WhatsApp (digits only, with country code)</label>
-              <input name="whatsapp" required value={form.whatsapp} onChange={handleChange} placeholder="919584484496" />
+              <label>WhatsApp</label>
+              <div className="rk-amgr__prefixed-input">
+                <span>+91</span>
+                <input
+                  name="whatsapp"
+                  required
+                  inputMode="numeric"
+                  pattern="\d{10}"
+                  maxLength={10}
+                  value={form.whatsapp}
+                  onChange={handleChange}
+                  placeholder="9584484496"
+                />
+              </div>
             </div>
           </div>
 
@@ -72,8 +121,8 @@ const ContactSettings = () => {
               <input name="email" type="email" required value={form.email} onChange={handleChange} placeholder="rentalking101@gmail.com" />
             </div>
             <div className="rk-amgr__field">
-              <label>Address (optional)</label>
-              <input name="address" value={form.address} onChange={handleChange} placeholder="211, NRK BIZ PARK, PU 4, Behind C21 mall, Indore" />
+              <label>Address</label>
+              <input name="address" required value={form.address} onChange={handleChange} placeholder="211, NRK BIZ PARK, PU 4, Behind C21 mall, Indore" />
             </div>
           </div>
 

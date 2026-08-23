@@ -113,6 +113,28 @@
   resize: vertical;
 }
 
+.rk-amgr__prefixed-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rk-amgr__prefixed-input span {
+  padding: 10px 10px 10px 12px;
+  font-size: 0.9rem;
+  color: var(--color-slate-500);
+  background: var(--color-slate-50, #f8fafc);
+  border-right: 1px solid var(--color-slate-200);
+}
+
+.rk-amgr__prefixed-input input {
+  border: none;
+  border-radius: 0;
+  flex: 1;
+}
+
 .rk-amgr__field input:focus,
 .rk-amgr__field select:focus,
 .rk-amgr__field textarea:focus {

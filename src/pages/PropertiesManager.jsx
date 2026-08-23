@@ -4,18 +4,27 @@ import {
   addProperty,
   editProperty,
   deleteProperty,
+  getPropertySchema,
 } from "../api/adminResourceApi";
 import "./AdminManager.css";
 
-const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial"];
+const emptySchema = {
+  categories: [],
+  statusesByCategory: {},
+  furnishingByCategory: {},
+  bhkByCategory: {},
+};
 
-const emptyForm = {
+const baseForm = {
   name: "",
   price: "",
   priceNumeric: "",
   location: "",
   address: "",
-  category: "Apartment",
+  category: "",
+  status: "",
+  furnishing: "",
+  bhk: "",
   coverImage: "",
   images: "",
   beds: "",
@@ -25,15 +34,32 @@ const emptyForm = {
   isFeatured: false,
 };
 
+// Picks valid status/furnishing/bhk for a category, keeping the current
+// value when it's still valid and otherwise falling back to the category's
+// first option (or "" when the category doesn't use that field at all).
+const repairDependentFields = (schema, category, current) => {
+  const statuses = schema.statusesByCategory[category] || [];
+  const furnishings = schema.furnishingByCategory[category] || [];
+  const bhks = schema.bhkByCategory[category] || [];
+  return {
+    status: statuses.includes(current.status) ? current.status : statuses[0] || "",
+    furnishing: furnishings.includes(current.furnishing) ? current.furnishing : furnishings[0] || "",
+    bhk: bhks.includes(current.bhk) ? current.bhk : bhks[0] || "",
+  };
+};
+
 const PropertiesManager = ({ featuredOnly }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [schema, setSchema] = useState(emptySchema);
+  const [schemaLoading, setSchemaLoading] = useState(true);
+
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState(baseForm);
   const [saving, setSaving] = useState(false);
 
   const fetchProperties = async () => {
@@ -48,26 +74,50 @@ const PropertiesManager = ({ featuredOnly }) => {
     }
   };
 
+  const fetchSchema = async () => {
+    setSchemaLoading(true);
+    try {
+      const data = await getPropertySchema();
+      setSchema(data);
+    } catch {
+      setError("Failed to load property schema.");
+    } finally {
+      setSchemaLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchProperties();
+    fetchSchema();
   }, []);
 
   const visible = featuredOnly ? properties.filter((p) => p.isFeatured) : properties;
 
   const openAddForm = () => {
-    setForm(emptyForm);
+    const category = schema.categories[0] || "";
+    setForm({
+      ...baseForm,
+      category,
+      ...repairDependentFields(schema, category, { status: "", furnishing: "", bhk: "" }),
+    });
     setEditingId(null);
     setShowForm(true);
   };
 
   const openEditForm = (p) => {
+    const category = p.category || schema.categories[0] || "";
     setForm({
       name: p.name || "",
       price: p.price || "",
       priceNumeric: p.priceNumeric ?? "",
       location: p.location || "",
       address: p.address || "",
-      category: p.category || "Apartment",
+      category,
+      ...repairDependentFields(schema, category, {
+        status: p.status || "",
+        furnishing: p.furnishing || "",
+        bhk: p.bhk || "",
+      }),
       coverImage: p.coverImage || "",
       images: (p.images || []).join(", "),
       beds: p.beds ?? "",
@@ -82,7 +132,11 @@ const PropertiesManager = ({ featuredOnly }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    if (name === "category") {
+      setForm((f) => ({ ...f, category: value, ...repairDependentFields(schema, value, f) }));
+    } else {
+      setForm((f) => ({ ...f, [name]: type === "checkbox" ? checked : value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -100,6 +154,8 @@ const PropertiesManager = ({ featuredOnly }) => {
         ? form.images.split(",").map((s) => s.trim()).filter(Boolean)
         : [],
     };
+    if (!payload.furnishing) delete payload.furnishing;
+    if (!payload.bhk) delete payload.bhk;
 
     try {
       if (editingId) {
@@ -143,7 +199,9 @@ const PropertiesManager = ({ featuredOnly }) => {
       <div className="rk-amgr__head">
         <h2>{featuredOnly ? "Featured Properties" : "Properties"}</h2>
         {!featuredOnly && (
-          <button className="rk-amgr__add" onClick={openAddForm}>+ Add Property</button>
+          <button className="rk-amgr__add" onClick={openAddForm} disabled={schemaLoading}>
+            + Add Property
+          </button>
         )}
       </div>
 
@@ -162,9 +220,40 @@ const PropertiesManager = ({ featuredOnly }) => {
             <div className="rk-amgr__field">
               <label>Category</label>
               <select name="category" value={form.category} onChange={handleChange}>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {schema.categories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
+          </div>
+
+          <div className="rk-amgr__row rk-amgr__row--3">
+            <div className="rk-amgr__field">
+              <label>Status</label>
+              <select name="status" required value={form.status} onChange={handleChange}>
+                {(schema.statusesByCategory[form.category] || []).map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            {(schema.furnishingByCategory[form.category] || []).length > 0 && (
+              <div className="rk-amgr__field">
+                <label>Furnishing</label>
+                <select name="furnishing" required value={form.furnishing} onChange={handleChange}>
+                  {schema.furnishingByCategory[form.category].map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {(schema.bhkByCategory[form.category] || []).length > 0 && (
+              <div className="rk-amgr__field">
+                <label>BHK</label>
+                <select name="bhk" required value={form.bhk} onChange={handleChange}>
+                  {schema.bhkByCategory[form.category].map((b) => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="rk-amgr__row rk-amgr__row--2">
@@ -272,7 +361,7 @@ const PropertiesManager = ({ featuredOnly }) => {
                   </td>
                   <td>
                     <div className="rk-amgr__row-actions">
-                      <button className="rk-amgr__edit" onClick={() => openEditForm(p)}>Edit</button>
+                      <button className="rk-amgr__edit" onClick={() => openEditForm(p)} disabled={schemaLoading}>Edit</button>
                       <button className="rk-amgr__delete" onClick={() => handleDelete(p._id)}>Delete</button>
                     </div>
                   </td>
