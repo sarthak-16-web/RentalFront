@@ -13,7 +13,6 @@ import ScrollToTop from "./components/Scrolltop";
 // Public Pages
 import Home from "./pages/Home";
 import PropertiesHome from "./pages/PropertiesHome";
-import TeamPreview from "./pages/TeamPreview";
 import PartnersMarquee from "./pages/Partnersmarquee";
 import TestimonialsHome from "./pages/TestimonialsHome";
 import Properties from "./pages/Properties";
@@ -46,7 +45,6 @@ function App() {
                 <Navbar />
                 <Home />
                 <PropertiesHome />
-                <TeamPreview />
                 <PartnersMarquee />
                 <TestimonialsHome />
                 <Fotter />

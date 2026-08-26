@@ -5,6 +5,8 @@ import PropertiesManager from "./PropertiesManager";
 import ProjectsManager from "./ProjectsManager";
 import TestimonialsManager from "./TestimonialsManager";
 import ContactSettings from "./ContactSettings";
+import TeamManager from "./TeamManager";
+import PartnersManager from "./PartnersManager";
 import { Link } from "react-router-dom";
 import "./AdminDashboard.css";
 
@@ -14,6 +16,8 @@ const TABS = [
   { key: "projects", label: "Upcoming Projects" },
   { key: "testimonials", label: "Testimonials" },
   { key: "contacts", label: "Contact Details" },
+  { key: "team", label: "Team" },
+  { key: "partners", label: "Channel Partners" },
 ];
 
 const AdminDashboard = () => {
@@ -58,6 +62,8 @@ const AdminDashboard = () => {
         {activeTab === "projects" && <ProjectsManager />}
         {activeTab === "testimonials" && <TestimonialsManager />}
         {activeTab === "contacts" && <ContactSettings />}
+        {activeTab === "team" && <TeamManager />}
+        {activeTab === "partners" && <PartnersManager />}
       </main>
     </div>
   );

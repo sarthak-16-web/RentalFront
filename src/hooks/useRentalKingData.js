@@ -91,3 +91,31 @@ export const useTestimonials = () =>
       return data.testimonials ?? [];
     },
   });
+
+// =======================
+// Team
+// =======================
+
+export const useTeam = () =>
+  useQuery({
+    queryKey: ["team"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/team/get-all");
+      return data.members ?? [];
+    },
+  });
+
+// =======================
+// Partners
+// =======================
+
+export const usePartners = () =>
+  useQuery({
+    queryKey: ["partners"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/partner/get-all");
+      return data.partners ?? [];
+    },
+  });
