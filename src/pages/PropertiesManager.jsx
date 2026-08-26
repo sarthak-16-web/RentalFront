@@ -16,6 +16,7 @@ const emptySchema = {
   bhkByCategory: {},
   priceFrequencies: [],
   priceFrequencyStatuses: [],
+  bedsRangeByBhk: {},
 };
 
 const baseForm = {
@@ -56,6 +57,16 @@ const repairDependentFields = (schema, category, current) => {
 const repairPriceFrequency = (schema, status, current) => {
   if (!schema.priceFrequencyStatuses.includes(status)) return "";
   return schema.priceFrequencies.includes(current) ? current : schema.priceFrequencies[0] || "";
+};
+
+// Beds is locked to a fixed value for most BHKs and only free-choice (with a
+// floor) for "5+ BHK" - keep it valid whenever the BHK it depends on changes.
+const repairBeds = (schema, bhk, current) => {
+  const range = schema.bedsRangeByBhk[bhk];
+  if (!range) return "";
+  if (range.min === range.max) return range.min;
+  const currentNum = Number(current);
+  return currentNum >= range.min ? currentNum : range.min;
 };
 
 const PropertiesManager = ({ featuredOnly }) => {
@@ -111,6 +122,7 @@ const PropertiesManager = ({ featuredOnly }) => {
       category,
       ...dependent,
       priceFrequency: repairPriceFrequency(schema, dependent.status, ""),
+      beds: repairBeds(schema, dependent.bhk, ""),
     });
     setEditingId(null);
     setShowForm(true);
@@ -133,7 +145,7 @@ const PropertiesManager = ({ featuredOnly }) => {
       ...dependent,
       coverImage: p.coverImage || "",
       images: (p.images || []).join(", "),
-      beds: p.beds ?? "",
+      beds: repairBeds(schema, dependent.bhk, p.beds ?? ""),
       baths: p.baths ?? "",
       sqft: p.sqft || "",
       description: p.description || "",
@@ -153,10 +165,13 @@ const PropertiesManager = ({ featuredOnly }) => {
           category: value,
           ...dependent,
           priceFrequency: repairPriceFrequency(schema, dependent.status, f.priceFrequency),
+          beds: repairBeds(schema, dependent.bhk, f.beds),
         };
       });
     } else if (name === "status") {
       setForm((f) => ({ ...f, status: value, priceFrequency: repairPriceFrequency(schema, value, f.priceFrequency) }));
+    } else if (name === "bhk") {
+      setForm((f) => ({ ...f, bhk: value, beds: repairBeds(schema, value, f.beds) }));
     } else {
       setForm((f) => ({ ...f, [name]: type === "checkbox" ? checked : value }));
     }
@@ -178,8 +193,8 @@ const PropertiesManager = ({ featuredOnly }) => {
       furnishing: form.furnishing || null,
       bhk: form.bhk || null,
       priceFrequency: form.priceFrequency || null,
-      beds: form.beds ? Number(form.beds) : undefined,
-      baths: form.baths ? Number(form.baths) : undefined,
+      beds: form.beds ? Number(form.beds) : null,
+      baths: form.baths ? Number(form.baths) : null,
       images: form.images
         ? form.images.split(",").map((s) => s.trim()).filter(Boolean)
         : [],
@@ -221,6 +236,10 @@ const PropertiesManager = ({ featuredOnly }) => {
       setError("Failed to update featured status.");
     }
   };
+
+  const bedsRange = schema.bedsRangeByBhk[form.bhk];
+  const bedsLocked = !!bedsRange && bedsRange.min === bedsRange.max;
+  const showBedsBaths = (schema.bhkByCategory[form.category] || []).length > 0;
 
   return (
     <div>
@@ -332,14 +351,26 @@ const PropertiesManager = ({ featuredOnly }) => {
           </div>
 
           <div className="rk-amgr__row rk-amgr__row--3">
-            <div className="rk-amgr__field">
-              <label>Beds</label>
-              <input name="beds" type="number" value={form.beds} onChange={handleChange} />
-            </div>
-            <div className="rk-amgr__field">
-              <label>Baths</label>
-              <input name="baths" type="number" value={form.baths} onChange={handleChange} />
-            </div>
+            {showBedsBaths && (
+              <>
+                <div className="rk-amgr__field">
+                  <label>Beds</label>
+                  <input
+                    name="beds"
+                    type="number"
+                    required
+                    readOnly={bedsLocked}
+                    min={bedsRange ? bedsRange.min : undefined}
+                    value={form.beds}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="rk-amgr__field">
+                  <label>Baths</label>
+                  <input name="baths" type="number" required min="1" value={form.baths} onChange={handleChange} />
+                </div>
+              </>
+            )}
             <div className="rk-amgr__field">
               <label>Sqft</label>
               <input name="sqft" value={form.sqft} onChange={handleChange} />
