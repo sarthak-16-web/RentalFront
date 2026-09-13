@@ -88,7 +88,7 @@ const PropertiesManager = () => {
     try {
       const data = await getAllProperties();
       setProperties(data || []);
-    } catch (err) {
+    } catch {
       setError("Failed to load properties.");
     } finally {
       setLoading(false);
@@ -222,7 +222,7 @@ const PropertiesManager = () => {
       await deleteProperty(id);
       setSuccess("Property deleted.");
       fetchProperties();
-    } catch (err) {
+    } catch {
       setError("Failed to delete property.");
     }
   };

@@ -95,11 +95,14 @@ const Home = () => {
   const [furnishing, setFurnishing] = useState([]);
   const [beds, setBeds] = useState([]);
 
-  const selected = { location, category, status, furnishing, bhk: beds };
+  const selected = useMemo(
+    () => ({ location, category, status, furnishing, bhk: beds }),
+    [location, category, status, furnishing, beds]
+  );
 
   const matched = useMemo(
     () => properties.filter((p) => matches(p, selected)),
-    [properties, location, category, status, furnishing, beds]
+    [properties, selected]
   );
 
   const priceSpan = useMemo(
@@ -116,25 +119,25 @@ const Home = () => {
   // other selections (its own excluded so it stays changeable).
   const locations = useMemo(
     () => [...new Set(properties.filter((p) => matches(p, { ...selected, location: [] })).map((p) => p.location?.split(",").pop()?.trim()).filter(Boolean))].sort(),
-    [properties, location, category, status, furnishing, beds]
+    [properties, selected]
   );
   const categories = useMemo(
     () => sortByOrder([...new Set(properties.filter((p) => matches(p, { ...selected, category: [] })).map((p) => p.category).filter(Boolean))], schema?.categories),
-    [properties, location, category, status, furnishing, beds, schema]
+    [properties, selected, schema]
   );
   const statuses = useMemo(
     () => [...new Set(properties.filter((p) => matches(p, { ...selected, status: [] })).map((p) => p.status).filter(Boolean))].sort(),
-    [properties, location, category, status, furnishing, beds]
+    [properties, selected]
   );
   const furnishingOptions = useMemo(
     () => [...new Set(properties.filter((p) => matches(p, { ...selected, furnishing: [] })).map((p) => p.furnishing).filter(Boolean))].sort(),
-    [properties, location, category, status, furnishing, beds]
+    [properties, selected]
   );
   const bhkOptions = useMemo(
     () => [...new Set(properties.filter((p) => matches(p, { ...selected, bhk: [] })).map((p) => p.bhk).filter(Boolean))].sort(
       (a, b) => parseInt(a, 10) - parseInt(b, 10)
     ),
-    [properties, location, category, status, furnishing, beds]
+    [properties, selected]
   );
 
   const toggleSelection = (dim, value) => {

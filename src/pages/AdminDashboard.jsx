@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAdminAuth } from "../context/AdminAuthContext";
+import { useAdminAuth } from "../hooks/useAdminAuth";
 import PropertiesManager from "./PropertiesManager";
 import ProjectsManager from "./ProjectsManager";
 import TestimonialsManager from "./TestimonialsManager";

@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { checkAdminSession, loginAdmin, logoutAdmin } from "../api/adminApi";
-
-const AdminAuthContext = createContext();
+import { AdminAuthContext } from "./adminAuthContextObject";
 
 export const AdminAuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
@@ -41,5 +40,3 @@ export const AdminAuthProvider = ({ children }) => {
     </AdminAuthContext.Provider>
   );
 };
-
-export const useAdminAuth = () => useContext(AdminAuthContext);

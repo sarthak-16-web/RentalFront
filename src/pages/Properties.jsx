@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PropertyCard from "../components/PropertyCard";
 import FacetSelect from "../components/FacetSelect";
@@ -140,8 +140,10 @@ const Properties = () => {
     });
   }, [filtered, priceSlider, areaSlider, effPrice.min, effPrice.max, effArea.min, effArea.max]);
 
-  const sortValue = (p) =>
-    sort.startsWith("price") ? p.priceNumeric : parseArea(p.sqft);
+  const sortValue = useCallback(
+    (p) => (sort.startsWith("price") ? p.priceNumeric : parseArea(p.sqft)),
+    [sort]
+  );
 
   const sorted = useMemo(() => {
     const list = [...results];
@@ -154,7 +156,7 @@ const Properties = () => {
       return sort.endsWith("asc") ? va - vb : vb - va;
     });
     return list;
-  }, [results, sort]);
+  }, [results, sort, sortValue]);
 
   const buildParams = (f, pr, ar) => {
     const params = new URLSearchParams();

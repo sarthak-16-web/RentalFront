@@ -1,7 +1,7 @@
 import Reveal from "../components/Reveal";
 import "./Upcomingprojects.css";
 import { useProjects } from "../hooks/useRentalKingData";
-import { Link, useLocation , useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 const ArrowIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path
