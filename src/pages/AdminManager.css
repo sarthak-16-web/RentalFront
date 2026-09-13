@@ -222,6 +222,24 @@
 
 .rk-amgr__table tr:last-child td { border-bottom: none; }
 
+.rk-amgr__drag-handle {
+  width: 24px;
+  padding-right: 0 !important;
+  cursor: grab;
+  color: var(--color-slate-500);
+  font-size: 1.1rem;
+  text-align: center;
+  user-select: none;
+}
+
+.rk-amgr__row--dragging {
+  opacity: 0.4;
+}
+
+.rk-amgr__row--drag-over {
+  box-shadow: inset 0 2px 0 var(--color-gold-500);
+}
+
 .rk-amgr__thumb {
   width: 44px;
   height: 44px;

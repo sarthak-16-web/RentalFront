@@ -9,7 +9,7 @@ import {
 import "./AdminManager.css";
 
 const emptyDirectorForm = { name: "", role: "", photo: "", message: "" };
-const emptyMemberForm = { name: "", role: "", photo: "", blurb: "", order: "" };
+const emptyMemberForm = { name: "", role: "", photo: "", blurb: "" };
 
 const TeamManager = () => {
   const { data: directorMessage, isLoading: directorLoading } = useDirectorMessage();
@@ -83,7 +83,6 @@ const TeamManager = () => {
       role: m.role || "",
       photo: m.photo || "",
       blurb: m.blurb || "",
-      order: m.order ?? "",
     });
     setEditingId(m._id);
     setShowForm(true);
@@ -96,14 +95,14 @@ const TeamManager = () => {
     setSaving(true);
     setError("");
     setSuccess("");
-    const payload = { ...form, order: form.order === "" ? 0 : Number(form.order) };
 
     try {
       if (editingId) {
-        await editTeamMember(editingId, payload);
+        await editTeamMember(editingId, form);
         setSuccess("Team member updated successfully.");
       } else {
-        await addTeamMember(payload);
+        // New members go to the end of the order; reorder by dragging.
+        await addTeamMember({ ...form, order: members.length });
         setSuccess("Team member added successfully.");
       }
       setShowForm(false);
@@ -123,6 +122,46 @@ const TeamManager = () => {
       fetchMembers();
     } catch {
       setError("Failed to delete team member.");
+    }
+  };
+
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  const handleDragStart = (index) => (e) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index)); // needed for Firefox
+  };
+
+  const handleDragOver = (index) => (e) => {
+    e.preventDefault();
+    if (index !== dragOverIndex) setDragOverIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (index) => async (e) => {
+    e.preventDefault();
+    handleDragEnd();
+    if (dragIndex === null || dragIndex === index) return;
+
+    const reordered = [...members];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(index, 0, moved);
+    setMembers(reordered); // optimistic - reflect the new order immediately
+
+    setError("");
+    try {
+      await Promise.all(
+        reordered.map((m, i) => (m.order === i ? null : editTeamMember(m._id, { order: i })))
+      );
+    } catch {
+      setError("Failed to save the new order.");
+      fetchMembers(); // resync with the server's actual state
     }
   };
 
@@ -211,11 +250,6 @@ const TeamManager = () => {
             <input name="blurb" required value={form.blurb} onChange={handleChange} />
           </div>
 
-          <div className="rk-amgr__field">
-            <label>Order (lower shows first)</label>
-            <input name="order" type="number" value={form.order} onChange={handleChange} />
-          </div>
-
           <div className="rk-amgr__actions">
             <button type="submit" className="rk-amgr__save" disabled={saving}>
               {saving ? "Saving..." : editingId ? "Update Member" : "Add Member"}
@@ -233,33 +267,47 @@ const TeamManager = () => {
         ) : members.length === 0 ? (
           <div className="rk-amgr__empty">No team members yet.</div>
         ) : (
-          <table className="rk-amgr__table">
-            <thead>
-              <tr>
-                <th>Photo</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Order</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((m) => (
-                <tr key={m._id}>
-                  <td><img src={m.photo} alt={m.name} className="rk-amgr__thumb" /></td>
-                  <td>{m.name}</td>
-                  <td>{m.role}</td>
-                  <td>{m.order}</td>
-                  <td>
-                    <div className="rk-amgr__row-actions">
-                      <button className="rk-amgr__edit" onClick={() => openEditForm(m)}>Edit</button>
-                      <button className="rk-amgr__delete" onClick={() => handleDelete(m._id)}>Delete</button>
-                    </div>
-                  </td>
+          <>
+            <p className="rk-amgr__hint">Drag rows by the handle to reorder.</p>
+            <table className="rk-amgr__table">
+              <thead>
+                <tr>
+                  <th />
+                  <th>Photo</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {members.map((m, i) => (
+                  <tr
+                    key={m._id}
+                    draggable
+                    onDragStart={handleDragStart(i)}
+                    onDragOver={handleDragOver(i)}
+                    onDrop={handleDrop(i)}
+                    onDragEnd={handleDragEnd}
+                    className={
+                      (dragIndex === i ? "rk-amgr__row--dragging " : "") +
+                      (dragOverIndex === i && dragIndex !== i ? "rk-amgr__row--drag-over" : "")
+                    }
+                  >
+                    <td className="rk-amgr__drag-handle" aria-label="Drag to reorder">⠿</td>
+                    <td><img src={m.photo} alt={m.name} className="rk-amgr__thumb" /></td>
+                    <td>{m.name}</td>
+                    <td>{m.role}</td>
+                    <td>
+                      <div className="rk-amgr__row-actions">
+                        <button className="rk-amgr__edit" onClick={() => openEditForm(m)}>Edit</button>
+                        <button className="rk-amgr__delete" onClick={() => handleDelete(m._id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
     </div>
