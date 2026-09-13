@@ -15,8 +15,7 @@ const buildWhatsappLink = (links, form) => {
     `New Partner Inquiry\n\n` +
     `Name/Company: ${form.name}\n` +
     `Type: ${form.type}\n` +
-    `Phone: ${form.phone}\n` +
-    `Email: ${form.email}\n` +
+    (form.email ? `Email: ${form.email}\n` : "") +
     `Message: ${form.message}`;
   return links.waText(text);
 };
@@ -100,9 +99,9 @@ const STEPS = [
 ];
 
 const STATS = [
-  { value: 12, suffix: "+", label: "Builder Partners" },
-  { value: 300, suffix: "+", label: "Successful Referrals" },
-  { value: 25, suffix: "+", label: "Financial Partners" },
+  { value: 25, suffix: "+", label: "Builder Partners" },
+  { value: 1000, suffix: "+", label: "Happy Clients" },
+  { value: 100, suffix: "+", label: "MNCs" },
   { value: 100, suffix: "%", label: "Partner Satisfaction" },
 ];
 
@@ -159,7 +158,7 @@ const Collaboration = () => {
     return () => observer.disconnect();
   }, []);
 
-  const EMPTY_FORM = { name: "", type: "", phone: "", email: "", message: "" };
+  const EMPTY_FORM = { name: "", type: "", email: "", message: "" };
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
 
@@ -289,15 +288,9 @@ const Collaboration = () => {
                   </select>
                 </div>
               </div>
-              <div className="rk-collab__row">
-                <div className="rk-collab__field">
-                  <label htmlFor="phone">Phone</label>
-                  <input id="phone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+91 00000 00000" />
-                </div>
-                <div className="rk-collab__field">
-                  <label htmlFor="email">Email</label>
-                  <input id="email" name="email" type="email" required value={form.email} onChange={handleChange} placeholder="you@example.com" />
-                </div>
+              <div className="rk-collab__field">
+                <label htmlFor="email">Email (optional)</label>
+                <input id="email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@example.com" />
               </div>
               <div className="rk-collab__field">
                 <label htmlFor="message">Message</label>
