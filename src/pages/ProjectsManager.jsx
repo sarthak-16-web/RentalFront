@@ -4,13 +4,15 @@ import {
   addProject,
   editProject,
   deleteProject,
+  getProjectSchema,
 } from "../api/adminResourceApi";
 import "./AdminManager.css";
 
-const emptyForm = { name: "", location: "", completion: "", units: "", image: "", description: "" };
+const emptyForm = { name: "", categories: [], images: "", description: "" };
 
 const ProjectsManager = () => {
   const [projects, setProjects] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -34,6 +36,9 @@ const ProjectsManager = () => {
 
   useEffect(() => {
     fetchProjects();
+    getProjectSchema()
+      .then((data) => setCategoryOptions(data.categories || []))
+      .catch(() => {});
   }, []);
 
   const openAddForm = () => {
@@ -45,10 +50,8 @@ const ProjectsManager = () => {
   const openEditForm = (p) => {
     setForm({
       name: p.name || "",
-      location: p.location || "",
-      completion: p.completion || "",
-      units: p.units ?? "",
-      image: p.image || "",
+      categories: p.categories || [],
+      images: (p.images || []).join(", "),
       description: p.description || "",
     });
     setEditingId(p._id);
@@ -57,12 +60,28 @@ const ProjectsManager = () => {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  const toggleCategory = (category) => {
+    setForm((f) => ({
+      ...f,
+      categories: f.categories.includes(category)
+        ? f.categories.filter((c) => c !== category)
+        : [...f.categories, category],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (form.categories.length === 0) {
+      setError("Select at least one category.");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess("");
-    const payload = { ...form, units: Number(form.units) };
+    const payload = {
+      ...form,
+      images: form.images.split(",").map((s) => s.trim()).filter(Boolean),
+    };
 
     try {
       if (editingId) {
@@ -95,7 +114,7 @@ const ProjectsManager = () => {
   return (
     <div>
       <div className="rk-amgr__head">
-        <h2>Upcoming Projects</h2>
+        <h2>Projects</h2>
         <button className="rk-amgr__add" onClick={openAddForm}>+ Add Project</button>
       </div>
 
@@ -106,36 +125,35 @@ const ProjectsManager = () => {
         <form className="rk-amgr__form" onSubmit={handleSubmit}>
           <h3>{editingId ? "Edit Project" : "Add New Project"}</h3>
 
-          <div className="rk-amgr__row rk-amgr__row--2">
-            <div className="rk-amgr__field">
-              <label>Name</label>
-              <input name="name" required value={form.name} onChange={handleChange} />
-            </div>
-            <div className="rk-amgr__field">
-              <label>Location</label>
-              <input name="location" required value={form.location} onChange={handleChange} />
-            </div>
+          <div className="rk-amgr__field">
+            <label>Name</label>
+            <input name="name" required value={form.name} onChange={handleChange} />
           </div>
 
-          <div className="rk-amgr__row rk-amgr__row--2">
-            <div className="rk-amgr__field">
-              <label>Completion (e.g. "Q3 2026")</label>
-              <input name="completion" required value={form.completion} onChange={handleChange} />
-            </div>
-            <div className="rk-amgr__field">
-              <label>Units</label>
-              <input name="units" type="number" required value={form.units} onChange={handleChange} />
+          <div className="rk-amgr__field">
+            <label>Categories</label>
+            <div className="rk-amgr__checkbox-group">
+              {categoryOptions.map((c) => (
+                <label className="rk-amgr__checkbox" key={c}>
+                  <input
+                    type="checkbox"
+                    checked={form.categories.includes(c)}
+                    onChange={() => toggleCategory(c)}
+                  />
+                  {c}
+                </label>
+              ))}
             </div>
           </div>
 
           <div className="rk-amgr__field">
-            <label>Image URL</label>
-            <input name="image" required value={form.image} onChange={handleChange} />
+            <label>Images (comma-separated URLs)</label>
+            <input name="images" required value={form.images} onChange={handleChange} />
           </div>
 
           <div className="rk-amgr__field">
             <label>Description</label>
-            <textarea name="description" rows={3} required value={form.description} onChange={handleChange} />
+            <textarea name="description" rows={5} required value={form.description} onChange={handleChange} />
           </div>
 
           <div className="rk-amgr__actions">
@@ -160,20 +178,24 @@ const ProjectsManager = () => {
               <tr>
                 <th>Image</th>
                 <th>Name</th>
-                <th>Location</th>
-                <th>Completion</th>
-                <th>Units</th>
+                <th>Categories</th>
+                <th>Description</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {projects.map((p) => (
                 <tr key={p._id}>
-                  <td><img src={p.image} alt={p.name} className="rk-amgr__thumb" /></td>
+                  <td><img src={p.images?.[0]} alt={p.name} className="rk-amgr__thumb" /></td>
                   <td>{p.name}</td>
-                  <td>{p.location}</td>
-                  <td><span className="rk-amgr__badge rk-amgr__badge--gold">{p.completion}</span></td>
-                  <td>{p.units}</td>
+                  <td>
+                    <div className="rk-amgr__badge-group">
+                      {(p.categories || []).map((c) => (
+                        <span key={c} className="rk-amgr__badge rk-amgr__badge--gold">{c}</span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="rk-amgr__td-truncate">{p.description}</td>
                   <td>
                     <div className="rk-amgr__row-actions">
                       <button className="rk-amgr__edit" onClick={() => openEditForm(p)}>Edit</button>

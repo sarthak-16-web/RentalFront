@@ -23,7 +23,7 @@ import Testimonials from "./pages/Testimonials";
 import ContactUs from "./pages/Contactus";
 import Collaboration from "./pages/Collaboration";
 import TeamMemberDetails from "./pages/Teammemberdetails";
-import UpcomingProjects from "./pages/Upcomingprojects";
+import Projects from "./pages/Projects";
 import Legalpage from "./pages/Legalpage";
 
 // Admin Pages
@@ -123,11 +123,11 @@ function App() {
           />
 
           <Route
-            path="/upcoming"
+            path="/projects"
             element={
               <>
                 <Navbar />
-                <UpcomingProjects />
+                <Projects />
                 <Footer />
               </>
             }

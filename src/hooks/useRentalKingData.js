@@ -78,6 +78,18 @@ export const useProjects = () =>
     },
   });
 
+export const useProjectSchema = () =>
+  useQuery({
+    queryKey: ["projectSchema"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/project/schema");
+      return data;
+    },
+
+    staleTime: 5 * 60 * 1000,
+  });
+
 // =======================
 // Testimonials
 // =======================

@@ -27,6 +27,10 @@ export const getAllProjects = async () => {
   const res = await api.get("/project/get-all");
   return res.data.projects;
 };
+export const getProjectSchema = async () => {
+  const res = await api.get("/project/schema");
+  return res.data;
+};
 export const addProject = async (data) => {
   const res = await api.post("/project/add", data);
   return res.data;

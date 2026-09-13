@@ -12,7 +12,7 @@ import "./AdminDashboard.css";
 
 const TABS = [
   { key: "properties", label: "Properties" },
-  { key: "projects", label: "Upcoming Projects" },
+  { key: "projects", label: "Projects" },
   { key: "testimonials", label: "Testimonials" },
   { key: "contacts", label: "Contact Details" },
   { key: "team", label: "Team" },

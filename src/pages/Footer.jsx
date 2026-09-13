@@ -17,7 +17,7 @@ const InstagramIcon = () => (
 
 const EXPLORE_LINKS = [
   { label: "Properties", to: "/properties" },
-  { label: "Upcoming Projects", to: "/upcoming" },
+  { label: "Projects", to: "/projects" },
   { label: "Testimonials", to: "/testimonials" },
 ];
 

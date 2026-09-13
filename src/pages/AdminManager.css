@@ -156,6 +156,17 @@
   height: 17px;
 }
 
+.rk-amgr__checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 16px;
+}
+
+.rk-amgr__checkbox-group .rk-amgr__checkbox {
+  margin-bottom: 0;
+}
+
 .rk-amgr__actions {
   display: flex;
   gap: 10px;
@@ -222,6 +233,13 @@
 
 .rk-amgr__table tr:last-child td { border-bottom: none; }
 
+.rk-amgr__table td.rk-amgr__td-truncate {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .rk-amgr__drag-handle {
   width: 24px;
   padding-right: 0 !important;
@@ -256,6 +274,12 @@
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
+}
+
+.rk-amgr__badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .rk-amgr__badge--gold {
