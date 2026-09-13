@@ -7,7 +7,7 @@ import {
 } from "../api/adminResourceApi";
 import "./AdminManager.css";
 
-const emptyForm = { name: "", logo: "", order: "" };
+const emptyForm = { name: "", logo: "" };
 
 const PartnersManager = () => {
   const [partners, setPartners] = useState([]);
@@ -46,7 +46,6 @@ const PartnersManager = () => {
     setForm({
       name: p.name || "",
       logo: p.logo || "",
-      order: p.order ?? "",
     });
     setEditingId(p._id);
     setShowForm(true);
@@ -59,14 +58,14 @@ const PartnersManager = () => {
     setSaving(true);
     setError("");
     setSuccess("");
-    const payload = { ...form, order: form.order === "" ? 0 : Number(form.order) };
 
     try {
       if (editingId) {
-        await editPartner(editingId, payload);
+        await editPartner(editingId, form);
         setSuccess("Partner updated successfully.");
       } else {
-        await addPartner(payload);
+        // New partners go to the end of the order; reorder by dragging.
+        await addPartner({ ...form, order: partners.length });
         setSuccess("Partner added successfully.");
       }
       setShowForm(false);
@@ -86,6 +85,46 @@ const PartnersManager = () => {
       fetchPartners();
     } catch {
       setError("Failed to delete partner.");
+    }
+  };
+
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  const handleDragStart = (index) => (e) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index)); // needed for Firefox
+  };
+
+  const handleDragOver = (index) => (e) => {
+    e.preventDefault();
+    if (index !== dragOverIndex) setDragOverIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (index) => async (e) => {
+    e.preventDefault();
+    handleDragEnd();
+    if (dragIndex === null || dragIndex === index) return;
+
+    const reordered = [...partners];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(index, 0, moved);
+    setPartners(reordered); // optimistic - reflect the new order immediately
+
+    setError("");
+    try {
+      await Promise.all(
+        reordered.map((p, i) => (p.order === i ? null : editPartner(p._id, { order: i })))
+      );
+    } catch {
+      setError("Failed to save the new order.");
+      fetchPartners(); // resync with the server's actual state
     }
   };
 
@@ -113,11 +152,6 @@ const PartnersManager = () => {
             <input name="logo" required value={form.logo} onChange={handleChange} />
           </div>
 
-          <div className="rk-amgr__field">
-            <label>Order (lower shows first)</label>
-            <input name="order" type="number" value={form.order} onChange={handleChange} />
-          </div>
-
           <div className="rk-amgr__actions">
             <button type="submit" className="rk-amgr__save" disabled={saving}>
               {saving ? "Saving..." : editingId ? "Update Partner" : "Add Partner"}
@@ -135,31 +169,45 @@ const PartnersManager = () => {
         ) : partners.length === 0 ? (
           <div className="rk-amgr__empty">No partners yet.</div>
         ) : (
-          <table className="rk-amgr__table">
-            <thead>
-              <tr>
-                <th>Logo</th>
-                <th>Name</th>
-                <th>Order</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {partners.map((p) => (
-                <tr key={p._id}>
-                  <td><img src={p.logo} alt={p.name} className="rk-amgr__thumb" /></td>
-                  <td>{p.name}</td>
-                  <td>{p.order}</td>
-                  <td>
-                    <div className="rk-amgr__row-actions">
-                      <button className="rk-amgr__edit" onClick={() => openEditForm(p)}>Edit</button>
-                      <button className="rk-amgr__delete" onClick={() => handleDelete(p._id)}>Delete</button>
-                    </div>
-                  </td>
+          <>
+            <p className="rk-amgr__hint">Drag rows by the handle to reorder.</p>
+            <table className="rk-amgr__table">
+              <thead>
+                <tr>
+                  <th />
+                  <th>Logo</th>
+                  <th>Name</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {partners.map((p, i) => (
+                  <tr
+                    key={p._id}
+                    draggable
+                    onDragStart={handleDragStart(i)}
+                    onDragOver={handleDragOver(i)}
+                    onDrop={handleDrop(i)}
+                    onDragEnd={handleDragEnd}
+                    className={
+                      (dragIndex === i ? "rk-amgr__row--dragging " : "") +
+                      (dragOverIndex === i && dragIndex !== i ? "rk-amgr__row--drag-over" : "")
+                    }
+                  >
+                    <td className="rk-amgr__drag-handle" aria-label="Drag to reorder">⠿</td>
+                    <td><img src={p.logo} alt={p.name} className="rk-amgr__thumb" /></td>
+                    <td>{p.name}</td>
+                    <td>
+                      <div className="rk-amgr__row-actions">
+                        <button className="rk-amgr__edit" onClick={() => openEditForm(p)}>Edit</button>
+                        <button className="rk-amgr__delete" onClick={() => handleDelete(p._id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
     </div>
