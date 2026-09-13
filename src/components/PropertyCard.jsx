@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { formatPrice } from "../lib/priceFormat";
+import { useQuickView } from "../hooks/useQuickView";
 import "./PropertyCard.css";
 
 const BedIcon = () => (
@@ -21,6 +22,7 @@ const PinIcon = () => (
 );
 
 const PropertyCard = ({ property }) => {
+  const { open } = useQuickView();
   const image =
     property.image ||
     property.coverImage ||
@@ -28,7 +30,13 @@ const PropertyCard = ({ property }) => {
     "https://placehold.co/600x400?text=No+Image";
 
   return (
-    <Link to={`/properties/${property._id}`} className="rk-pcard">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => open(property)}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open(property)}
+      className="rk-pcard"
+    >
       <div
         className="rk-pcard__image"
         style={{ backgroundImage: `url(${image})` }}
@@ -44,7 +52,9 @@ const PropertyCard = ({ property }) => {
         <h4>{property.name}</h4>
 
         <div className="rk-pcard__meta">
-          <span className="rk-pcard__price">{property.price}</span>
+          <span className="rk-pcard__price">
+            {formatPrice(property.priceNumeric, property.status, property.priceFrequency)}
+          </span>
 
           <span className="rk-pcard__specs">
             {property.beds && (
@@ -61,7 +71,7 @@ const PropertyCard = ({ property }) => {
           </span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

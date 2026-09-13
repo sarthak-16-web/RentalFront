@@ -4,20 +4,34 @@ import {
   addProperty,
   editProperty,
   deleteProperty,
+  getPropertySchema,
 } from "../api/adminResourceApi";
+import { formatPrice } from "../lib/priceFormat";
+import AssetPicker from "../components/AssetPicker";
 import "./AdminManager.css";
 
-const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial"];
+const emptySchema = {
+  categories: [],
+  statusesByCategory: {},
+  furnishingByCategory: {},
+  bhkByCategory: {},
+  priceFrequencies: [],
+  priceFrequencyStatuses: [],
+  bedsRangeByBhk: {},
+};
 
-const emptyForm = {
+const baseForm = {
   name: "",
-  price: "",
   priceNumeric: "",
+  priceFrequency: "",
   location: "",
   address: "",
-  category: "Apartment",
+  category: "",
+  status: "",
+  furnishing: "",
+  bhk: "",
   coverImage: "",
-  images: "",
+  images: [],
   beds: "",
   baths: "",
   sqft: "",
@@ -25,15 +39,49 @@ const emptyForm = {
   isFeatured: false,
 };
 
-const PropertiesManager = ({ featuredOnly }) => {
+// Picks valid status/furnishing/bhk for a category, keeping the current
+// value when it's still valid and otherwise falling back to the category's
+// first option (or "" when the category doesn't use that field at all).
+const repairDependentFields = (schema, category, current) => {
+  const statuses = schema.statusesByCategory[category] || [];
+  const furnishings = schema.furnishingByCategory[category] || [];
+  const bhks = schema.bhkByCategory[category] || [];
+  return {
+    status: statuses.includes(current.status) ? current.status : statuses[0] || "",
+    furnishing: furnishings.includes(current.furnishing) ? current.furnishing : furnishings[0] || "",
+    bhk: bhks.includes(current.bhk) ? current.bhk : bhks[0] || "",
+  };
+};
+
+// Price frequency only applies to statuses that bill recurringly (e.g. "For
+// Rent"); everything else should have it cleared entirely.
+const repairPriceFrequency = (schema, status, current) => {
+  if (!schema.priceFrequencyStatuses.includes(status)) return "";
+  return schema.priceFrequencies.includes(current) ? current : schema.priceFrequencies[0] || "";
+};
+
+// Beds is locked to a fixed value for most BHKs and only free-choice (with a
+// floor) for "5+ BHK" - keep it valid whenever the BHK it depends on changes.
+const repairBeds = (schema, bhk, current) => {
+  const range = schema.bedsRangeByBhk[bhk];
+  if (!range) return "";
+  if (range.min === range.max) return range.min;
+  const currentNum = Number(current);
+  return currentNum >= range.min ? currentNum : range.min;
+};
+
+const PropertiesManager = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [schema, setSchema] = useState(emptySchema);
+  const [schemaLoading, setSchemaLoading] = useState(true);
+
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState(baseForm);
   const [saving, setSaving] = useState(false);
 
   const fetchProperties = async () => {
@@ -41,36 +89,63 @@ const PropertiesManager = ({ featuredOnly }) => {
     try {
       const data = await getAllProperties();
       setProperties(data || []);
-    } catch (err) {
+    } catch {
       setError("Failed to load properties.");
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchSchema = async () => {
+    setSchemaLoading(true);
+    try {
+      const data = await getPropertySchema();
+      setSchema(data);
+    } catch {
+      setError("Failed to load property schema.");
+    } finally {
+      setSchemaLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchProperties();
+    fetchSchema();
   }, []);
 
-  const visible = featuredOnly ? properties.filter((p) => p.isFeatured) : properties;
 
   const openAddForm = () => {
-    setForm(emptyForm);
+    const category = schema.categories[0] || "";
+    const dependent = repairDependentFields(schema, category, { status: "", furnishing: "", bhk: "" });
+    setForm({
+      ...baseForm,
+      category,
+      ...dependent,
+      priceFrequency: repairPriceFrequency(schema, dependent.status, ""),
+      beds: repairBeds(schema, dependent.bhk, ""),
+    });
     setEditingId(null);
     setShowForm(true);
   };
 
   const openEditForm = (p) => {
+    const category = p.category || schema.categories[0] || "";
+    const dependent = repairDependentFields(schema, category, {
+      status: p.status || "",
+      furnishing: p.furnishing || "",
+      bhk: p.bhk || "",
+    });
     setForm({
       name: p.name || "",
-      price: p.price || "",
       priceNumeric: p.priceNumeric ?? "",
+      priceFrequency: repairPriceFrequency(schema, dependent.status, p.priceFrequency || ""),
       location: p.location || "",
       address: p.address || "",
-      category: p.category || "Apartment",
+      category,
+      ...dependent,
       coverImage: p.coverImage || "",
-      images: (p.images || []).join(", "),
-      beds: p.beds ?? "",
+      images: p.images || [],
+      beds: repairBeds(schema, dependent.bhk, p.beds ?? ""),
       baths: p.baths ?? "",
       sqft: p.sqft || "",
       description: p.description || "",
@@ -82,23 +157,48 @@ const PropertiesManager = ({ featuredOnly }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    if (name === "category") {
+      setForm((f) => {
+        const dependent = repairDependentFields(schema, value, f);
+        return {
+          ...f,
+          category: value,
+          ...dependent,
+          priceFrequency: repairPriceFrequency(schema, dependent.status, f.priceFrequency),
+          beds: repairBeds(schema, dependent.bhk, f.beds),
+        };
+      });
+    } else if (name === "status") {
+      setForm((f) => ({ ...f, status: value, priceFrequency: repairPriceFrequency(schema, value, f.priceFrequency) }));
+    } else if (name === "bhk") {
+      setForm((f) => ({ ...f, bhk: value, beds: repairBeds(schema, value, f.beds) }));
+    } else {
+      setForm((f) => ({ ...f, [name]: type === "checkbox" ? checked : value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.coverImage) {
+      setError("Choose a cover image.");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess("");
 
+    // Explicit null (not an omitted key) tells the backend to clear a field
+    // that doesn't apply to this category/status - an omitted key means
+    // "don't touch this", which matters for partial updates like toggling
+    // isFeatured.
     const payload = {
       ...form,
       priceNumeric: Number(form.priceNumeric),
-      beds: form.beds ? Number(form.beds) : undefined,
-      baths: form.baths ? Number(form.baths) : undefined,
-      images: form.images
-        ? form.images.split(",").map((s) => s.trim()).filter(Boolean)
-        : [],
+      furnishing: form.furnishing || null,
+      bhk: form.bhk || null,
+      priceFrequency: form.priceFrequency || null,
+      beds: form.beds ? Number(form.beds) : null,
+      baths: form.baths ? Number(form.baths) : null,
     };
 
     try {
@@ -124,7 +224,7 @@ const PropertiesManager = ({ featuredOnly }) => {
       await deleteProperty(id);
       setSuccess("Property deleted.");
       fetchProperties();
-    } catch (err) {
+    } catch {
       setError("Failed to delete property.");
     }
   };
@@ -138,13 +238,17 @@ const PropertiesManager = ({ featuredOnly }) => {
     }
   };
 
+  const bedsRange = schema.bedsRangeByBhk[form.bhk];
+  const bedsLocked = !!bedsRange && bedsRange.min === bedsRange.max;
+  const showBedsBaths = (schema.bhkByCategory[form.category] || []).length > 0;
+
   return (
     <div>
       <div className="rk-amgr__head">
-        <h2>{featuredOnly ? "Featured Properties" : "Properties"}</h2>
-        {!featuredOnly && (
-          <button className="rk-amgr__add" onClick={openAddForm}>+ Add Property</button>
-        )}
+        <h2>Properties</h2>
+        <button className="rk-amgr__add" onClick={openAddForm} disabled={schemaLoading}>
+          + Add Property
+        </button>
       </div>
 
       {error && <div className="rk-amgr__msg rk-amgr__msg--error">{error}</div>}
@@ -162,20 +266,66 @@ const PropertiesManager = ({ featuredOnly }) => {
             <div className="rk-amgr__field">
               <label>Category</label>
               <select name="category" value={form.category} onChange={handleChange}>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {schema.categories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
           </div>
 
+          <div className="rk-amgr__row rk-amgr__row--3">
+            <div className="rk-amgr__field">
+              <label>Status</label>
+              <select name="status" required value={form.status} onChange={handleChange}>
+                {(schema.statusesByCategory[form.category] || []).map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            {(schema.furnishingByCategory[form.category] || []).length > 0 && (
+              <div className="rk-amgr__field">
+                <label>Furnishing</label>
+                <select name="furnishing" required value={form.furnishing} onChange={handleChange}>
+                  {schema.furnishingByCategory[form.category].map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {(schema.bhkByCategory[form.category] || []).length > 0 && (
+              <div className="rk-amgr__field">
+                <label>BHK</label>
+                <select name="bhk" required value={form.bhk} onChange={handleChange}>
+                  {schema.bhkByCategory[form.category].map((b) => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
           <div className="rk-amgr__row rk-amgr__row--2">
             <div className="rk-amgr__field">
-              <label>Price (display text)</label>
-              <input name="price" required placeholder="₹45,000/month" value={form.price} onChange={handleChange} />
+              <label>Price</label>
+              <div className="rk-amgr__prefixed-input">
+                <span>₹</span>
+                <input
+                  name="priceNumeric"
+                  type="number"
+                  required
+                  min="0"
+                  value={form.priceNumeric}
+                  onChange={handleChange}
+                  placeholder="45000"
+                />
+              </div>
             </div>
-            <div className="rk-amgr__field">
-              <label>Price (numeric)</label>
-              <input name="priceNumeric" type="number" required value={form.priceNumeric} onChange={handleChange} />
-            </div>
+            {schema.priceFrequencyStatuses.includes(form.status) && (
+              <div className="rk-amgr__field">
+                <label>Frequency</label>
+                <select name="priceFrequency" required value={form.priceFrequency} onChange={handleChange}>
+                  {schema.priceFrequencies.map((f) => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="rk-amgr__row rk-amgr__row--2">
@@ -190,24 +340,43 @@ const PropertiesManager = ({ featuredOnly }) => {
           </div>
 
           <div className="rk-amgr__field">
-            <label>Cover Image URL</label>
-            <input name="coverImage" required value={form.coverImage} onChange={handleChange} />
+            <label>Cover Image</label>
+            <AssetPicker
+              value={form.coverImage}
+              onChange={(url) => setForm((f) => ({ ...f, coverImage: url }))}
+            />
           </div>
 
           <div className="rk-amgr__field">
-            <label>Additional Images (comma-separated URLs)</label>
-            <input name="images" value={form.images} onChange={handleChange} />
+            <label>Additional Images</label>
+            <AssetPicker
+              value={form.images}
+              onChange={(urls) => setForm((f) => ({ ...f, images: urls }))}
+              multiple
+            />
           </div>
 
           <div className="rk-amgr__row rk-amgr__row--3">
-            <div className="rk-amgr__field">
-              <label>Beds</label>
-              <input name="beds" type="number" value={form.beds} onChange={handleChange} />
-            </div>
-            <div className="rk-amgr__field">
-              <label>Baths</label>
-              <input name="baths" type="number" value={form.baths} onChange={handleChange} />
-            </div>
+            {showBedsBaths && (
+              <>
+                <div className="rk-amgr__field">
+                  <label>Beds</label>
+                  <input
+                    name="beds"
+                    type="number"
+                    required
+                    readOnly={bedsLocked}
+                    min={bedsRange ? bedsRange.min : undefined}
+                    value={form.beds}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="rk-amgr__field">
+                  <label>Baths</label>
+                  <input name="baths" type="number" required min="1" value={form.baths} onChange={handleChange} />
+                </div>
+              </>
+            )}
             <div className="rk-amgr__field">
               <label>Sqft</label>
               <input name="sqft" value={form.sqft} onChange={handleChange} />
@@ -238,10 +407,8 @@ const PropertiesManager = ({ featuredOnly }) => {
       <div className="rk-amgr__table-wrap">
         {loading ? (
           <div className="rk-amgr__empty">Loading...</div>
-        ) : visible.length === 0 ? (
-          <div className="rk-amgr__empty">
-            {featuredOnly ? "No featured properties yet." : "No properties yet."}
-          </div>
+        ) : properties.length === 0 ? (
+          <div className="rk-amgr__empty">No properties yet.</div>
         ) : (
           <table className="rk-amgr__table">
             <thead>
@@ -255,12 +422,12 @@ const PropertiesManager = ({ featuredOnly }) => {
               </tr>
             </thead>
             <tbody>
-              {visible.map((p) => (
+              {properties.map((p) => (
                 <tr key={p._id}>
                   <td><img src={p.coverImage} alt={p.name} className="rk-amgr__thumb" /></td>
                   <td>{p.name}<br /><span className="rk-amgr__badge">{p.location}</span></td>
                   <td><span className="rk-amgr__badge">{p.category}</span></td>
-                  <td>{p.price}</td>
+                  <td>{formatPrice(p.priceNumeric, p.status, p.priceFrequency)}</td>
                   <td>
                     <button
                       className={`rk-amgr__badge ${p.isFeatured ? "rk-amgr__badge--gold" : ""}`}
@@ -272,7 +439,7 @@ const PropertiesManager = ({ featuredOnly }) => {
                   </td>
                   <td>
                     <div className="rk-amgr__row-actions">
-                      <button className="rk-amgr__edit" onClick={() => openEditForm(p)}>Edit</button>
+                      <button className="rk-amgr__edit" onClick={() => openEditForm(p)} disabled={schemaLoading}>Edit</button>
                       <button className="rk-amgr__delete" onClick={() => handleDelete(p._id)}>Delete</button>
                     </div>
                   </td>

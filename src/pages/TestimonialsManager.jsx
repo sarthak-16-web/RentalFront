@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   getAllTestimonials,
   addTestimonial,
@@ -7,9 +8,10 @@ import {
 } from "../api/adminResourceApi";
 import "./AdminManager.css";
 
-const emptyForm = { name: "", property: "", rating: 5, text: "" };
+const emptyForm = { name: "", review: "" };
 
 const TestimonialsManager = () => {
+  const queryClient = useQueryClient();
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -45,9 +47,7 @@ const TestimonialsManager = () => {
   const openEditForm = (t) => {
     setForm({
       name: t.name || "",
-      property: t.property || "",
-      rating: t.rating ?? 5,
-      text: t.text || "",
+      review: t.review || "",
     });
     setEditingId(t._id);
     setShowForm(true);
@@ -60,22 +60,33 @@ const TestimonialsManager = () => {
     setSaving(true);
     setError("");
     setSuccess("");
-    const payload = { ...form, rating: Number(form.rating) };
 
     try {
       if (editingId) {
-        await editTestimonial(editingId, payload);
+        await editTestimonial(editingId, form);
         setSuccess("Testimonial updated successfully.");
       } else {
-        await addTestimonial(payload);
+        await addTestimonial(form);
         setSuccess("Testimonial added successfully.");
       }
       setShowForm(false);
       fetchTestimonials();
+      queryClient.invalidateQueries({ queryKey: ["adminTestimonials"] });
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleApprove = async (id) => {
+    try {
+      await editTestimonial(id, { approved: true });
+      setSuccess("Testimonial approved.");
+      fetchTestimonials();
+      queryClient.invalidateQueries({ queryKey: ["adminTestimonials"] });
+    } catch {
+      setError("Failed to approve testimonial.");
     }
   };
 
@@ -85,6 +96,7 @@ const TestimonialsManager = () => {
       await deleteTestimonial(id);
       setSuccess("Testimonial deleted.");
       fetchTestimonials();
+      queryClient.invalidateQueries({ queryKey: ["adminTestimonials"] });
     } catch {
       setError("Failed to delete testimonial.");
     }
@@ -97,6 +109,11 @@ const TestimonialsManager = () => {
         <button className="rk-amgr__add" onClick={openAddForm}>+ Add Testimonial</button>
       </div>
 
+      <p className="rk-amgr__hint">
+        Reviews submitted from the website land here as Pending. Approve them
+        to show them on the homepage, or delete them.
+      </p>
+
       {error && <div className="rk-amgr__msg rk-amgr__msg--error">{error}</div>}
       {success && <div className="rk-amgr__msg rk-amgr__msg--success">{success}</div>}
 
@@ -104,27 +121,14 @@ const TestimonialsManager = () => {
         <form className="rk-amgr__form" onSubmit={handleSubmit}>
           <h3>{editingId ? "Edit Testimonial" : "Add New Testimonial"}</h3>
 
-          <div className="rk-amgr__row rk-amgr__row--2">
-            <div className="rk-amgr__field">
-              <label>Name</label>
-              <input name="name" required value={form.name} onChange={handleChange} />
-            </div>
-            <div className="rk-amgr__field">
-              <label>Property</label>
-              <input name="property" required value={form.property} onChange={handleChange} placeholder="e.g. Sunrise Apartments, Vijay Nagar" />
-            </div>
+          <div className="rk-amgr__field">
+            <label>Name</label>
+            <input name="name" required maxLength={60} value={form.name} onChange={handleChange} />
           </div>
 
           <div className="rk-amgr__field">
-            <label>Rating (1–5)</label>
-            <select name="rating" value={form.rating} onChange={handleChange}>
-              {[1, 2, 3, 4, 5].map((r) => <option key={r} value={r}>{r}</option>)}
-            </select>
-          </div>
-
-          <div className="rk-amgr__field">
-            <label>Review Text</label>
-            <textarea name="text" rows={4} required value={form.text} onChange={handleChange} />
+            <label>Review</label>
+            <textarea name="review" rows={4} required maxLength={200} value={form.review} onChange={handleChange} />
           </div>
 
           <div className="rk-amgr__actions">
@@ -148,9 +152,8 @@ const TestimonialsManager = () => {
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Property</th>
-                <th>Rating</th>
                 <th>Review</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -158,11 +161,19 @@ const TestimonialsManager = () => {
               {testimonials.map((t) => (
                 <tr key={t._id}>
                   <td>{t.name}</td>
-                  <td>{t.property}</td>
-                  <td><span className="rk-amgr__badge rk-amgr__badge--gold">{t.rating} / 5</span></td>
-                  <td style={{ maxWidth: 260 }}>{t.text?.slice(0, 80)}{t.text?.length > 80 ? "..." : ""}</td>
+                  <td style={{ maxWidth: 320 }}>{t.review}</td>
+                  <td>
+                    {t.approved ? (
+                      <span className="rk-amgr__badge rk-amgr__badge--gold">Approved</span>
+                    ) : (
+                      <span className="rk-amgr__badge">Pending</span>
+                    )}
+                  </td>
                   <td>
                     <div className="rk-amgr__row-actions">
+                      {!t.approved && (
+                        <button className="rk-amgr__edit" onClick={() => handleApprove(t._id)}>Approve</button>
+                      )}
                       <button className="rk-amgr__edit" onClick={() => openEditForm(t)}>Edit</button>
                       <button className="rk-amgr__delete" onClick={() => handleDelete(t._id)}>Delete</button>
                     </div>

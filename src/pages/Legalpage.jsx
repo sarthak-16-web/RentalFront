@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
 import "./Legalpage.css";
 import AccordionSection from "./Accordionsection";
 
@@ -359,6 +361,8 @@ const DEFAULT_OPEN_IDS = ["privacy-overview"];
 
 const LegalPage = () => {
   const [openIds, setOpenIds] = useState(() => new Set(DEFAULT_OPEN_IDS));
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
 
   const toggleSection = (id) => {
     setOpenIds((prev) => {
@@ -368,17 +372,6 @@ const LegalPage = () => {
       } else {
         next.add(id);
       }
-      return next;
-    });
-  };
-
-  // TOC click: make sure the target section is open before the browser's
-  // native hash-scroll runs, so you don't jump to a collapsed panel.
-  const handleTocClick = (id) => {
-    setOpenIds((prev) => {
-      if (prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.add(id);
       return next;
     });
   };
@@ -396,27 +389,6 @@ const LegalPage = () => {
       </div>
 
       <div className="rk-legal__body">
-        <aside className="rk-legal__sidebar">
-          <nav className="rk-legal__toc" aria-label="On this page">
-            {GROUPS.map((g) => (
-              <div key={g.id} className="rk-legal__toc-group">
-                <a href={`#${g.id}`} className="rk-legal__toc-group-label">
-                  {g.label}
-                </a>
-                {g.sections.map((s) => (
-                  <a
-                    key={s.id}
-                    href={`#${s.id}`}
-                    onClick={() => handleTocClick(s.id)}
-                  >
-                    {s.heading}
-                  </a>
-                ))}
-              </div>
-            ))}
-          </nav>
-        </aside>
-
         <div className="rk-legal__content">
           {GROUPS.map((g) => (
             <div key={g.id} className="rk-legal__group">
@@ -439,8 +411,8 @@ const LegalPage = () => {
             <h3>Questions about any of this?</h3>
             <p>Reach our team any time — we usually reply within one business day.</p>
             <div className="rk-legal__contact-links">
-              <a href="mailto:rentalking101@gmail.com">rentalking101@gmail.com</a>
-              <a href="tel:+919300653927">+91 93006 53927</a>
+              {links?.mailto && <a href={links.mailto}>{contacts.email}</a>}
+              {links?.tel && <a href={links.tel}>{contacts.phone}</a>}
             </div>
           </div>
         </div>

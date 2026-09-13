@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
 import "./Navbar.css";
 
 const PhoneIcon = () => (
@@ -12,20 +14,6 @@ const MailIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="2" y="4" width="20" height="16" rx="2" />
     <path d="m22 6-10 7L2 6" />
-  </svg>
-);
-
-const ChevronIcon = ({ open }) => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .2s" }}
-  >
-    <path d="m6 9 6 6 6-6" />
   </svg>
 );
 
@@ -51,23 +39,17 @@ const WhatsappIcon = () => (
 const NAV_LINKS = [
   { label: "Home", to: "/" },
   { label: "Properties", to: "/properties" },
-  { label: "Featured", to: "/featured" },
-  { label: "Upcoming", to: "/upcoming" },
-  { label: "Testimonials", to: "/testimonials" },
-];
-
-const COMPANY_LINKS = [
-  { label: "Meet the Team", to: "/team" },
+  { label: "Projects", to: "/projects" },
+  { label: "Team", to: "/team" },
+  { label: "Services", to: "/contact" },
   { label: "Collaboration", to: "/collaboration" },
-  { label: "Contact & Support", to: "/contact" },
 ];
-
-const WHATSAPP_NUMBER = "919300653927"; // update with your actual WhatsApp number (no + or spaces)
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [companyOpen, setCompanyOpen] = useState(false);
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -81,14 +63,18 @@ const Navbar = () => {
       <div className="rk-topbar">
         <div className="rk-topbar__inner">
           <div className="rk-topbar__contact">
-            <a href="tel:+911234567890">
-              <PhoneIcon /> <span>+91 93006 53927</span>
-            </a>
-            <a href="mailto:hello@rentalking.com">
-              <MailIcon /> <span>rentalking101@gmail.com</span>
-            </a>
+            {links?.tel && (
+              <a href={links.tel}>
+                <PhoneIcon /> <span>{contacts.phone}</span>
+              </a>
+            )}
+            {links?.mailto && (
+              <a href={links.mailto}>
+                <MailIcon /> <span>{contacts.email}</span>
+              </a>
+            )}
           </div>
-          <p className="rk-topbar__tagline">Homes and spaces, matched right.</p>
+          <p className="rk-topbar__tagline">Your trusted real estate partner!</p>
         </div>
       </div>
 
@@ -98,7 +84,7 @@ const Navbar = () => {
           <Link to="/" className="rk-logo" onClick={() => setMobileOpen(false)}>
            <img
   src={"logo.jpeg"}
-  alt="Rental King"
+  alt="RentalKing"
   className="rk-logo__img"
 />
             <span className="rk-logo__text">
@@ -116,25 +102,6 @@ const Navbar = () => {
                 {link.label}
               </NavLink>
             ))}
-
-            <div
-              className="rk-dropdown"
-              onMouseEnter={() => setCompanyOpen(true)}
-              onMouseLeave={() => setCompanyOpen(false)}
-            >
-              <button className="rk-link rk-dropdown__trigger" onClick={() => setCompanyOpen((v) => !v)}>
-                Company <ChevronIcon open={companyOpen} />
-              </button>
-              {companyOpen && (
-                <div className="rk-dropdown__menu">
-                  {COMPANY_LINKS.map((link) => (
-                    <Link key={link.to} to={link.to} className="rk-dropdown__item">
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
           </nav>
 
           <div className="rk-nav__actions">
@@ -142,15 +109,17 @@ const Navbar = () => {
               Enquire Now
             </Link>
 
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rk-whatsapp"
-              aria-label="Chat on WhatsApp"
-            >
-              <WhatsappIcon />
-            </a>
+            {links?.wa && (
+              <a
+                href={links.wa}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rk-whatsapp"
+                aria-label="Chat on WhatsApp"
+              >
+                <WhatsappIcon />
+              </a>
+            )}
           </div>
 
           <button
@@ -166,7 +135,7 @@ const Navbar = () => {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="rk-mobile">
-          {[...NAV_LINKS, ...COMPANY_LINKS].map((link) => (
+          {NAV_LINKS.map((link) => (
             <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="rk-mobile__link">
               {link.label}
             </Link>
@@ -175,16 +144,18 @@ const Navbar = () => {
             <Link to="/contact" onClick={() => setMobileOpen(false)} className="rk-cta rk-cta--block">
               Enquire Now
             </Link>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rk-whatsapp rk-whatsapp--block"
-              aria-label="Chat on WhatsApp"
-            >
-              <WhatsappIcon />
-              <span>Chat on WhatsApp</span>
-            </a>
+            {links?.wa && (
+              <a
+                href={links.wa}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rk-whatsapp rk-whatsapp--block"
+                aria-label="Chat on WhatsApp"
+              >
+                <WhatsappIcon />
+                <span>Chat on WhatsApp</span>
+              </a>
+            )}
           </div>
         </div>
       )}

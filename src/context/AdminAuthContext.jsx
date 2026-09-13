@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { checkAdminSession, loginAdmin, logoutAdmin } from "../api/adminApi";
-
-const AdminAuthContext = createContext();
+import { AdminAuthContext } from "./adminAuthContextObject";
 
 export const AdminAuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
@@ -22,8 +21,8 @@ export const AdminAuthProvider = ({ children }) => {
     checkSession();
   }, []);
 
-  const login = async (email, password) => {
-    const data = await loginAdmin(email, password);
+  const login = async (username, password) => {
+    const data = await loginAdmin(username, password);
     setAdmin(data.admin);
     return data;
   };
@@ -41,5 +40,3 @@ export const AdminAuthProvider = ({ children }) => {
     </AdminAuthContext.Provider>
   );
 };
-
-export const useAdminAuth = () => useContext(AdminAuthContext);

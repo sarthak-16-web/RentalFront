@@ -1,15 +1,9 @@
 import { Link } from "react-router-dom";
-import "./Fotter.css";
+import "./Footer.css";
 
 const FacebookIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z" />
-  </svg>
-);
-
-const TwitterIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M22 5.9c-.7.32-1.46.53-2.25.63a3.9 3.9 0 0 0 1.72-2.16 7.9 7.9 0 0 1-2.5.95 3.9 3.9 0 0 0-6.66 3.57A11.1 11.1 0 0 1 3.9 4.9a3.9 3.9 0 0 0 1.21 5.22 3.9 3.9 0 0 1-1.77-.49v.05a3.9 3.9 0 0 0 3.13 3.83 3.9 3.9 0 0 1-1.76.07 3.9 3.9 0 0 0 3.65 2.72A7.86 7.86 0 0 1 2 18.4a11.1 11.1 0 0 0 6 1.76c7.2 0 11.13-5.96 11.13-11.13l-.01-.5A7.9 7.9 0 0 0 22 5.9Z" />
   </svg>
 );
 
@@ -21,29 +15,15 @@ const InstagramIcon = () => (
   </svg>
 );
 
-const LinkedinIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M6.94 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM3.2 8.75h3.5V21H3.2V8.75Zm6.15 0h3.35v1.68h.05c.47-.88 1.6-1.8 3.3-1.8 3.53 0 4.18 2.32 4.18 5.34V21h-3.5v-6.32c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.33V21H9.35V8.75Z" />
-  </svg>
-);
-
 const EXPLORE_LINKS = [
   { label: "Properties", to: "/properties" },
-  { label: "Featured", to: "/featured" },
-  { label: "Upcoming Projects", to: "/upcoming" },
-  { label: "Testimonials", to: "/testimonials" },
+  { label: "Projects", to: "/projects" },
 ];
 
 const COMPANY_LINKS = [
-  { label: "Meet the Team", to: "/team" },
+  { label: "Team", to: "/team" },
+  { label: "Services", to: "/contact" },
   { label: "Collaboration", to: "/collaboration" },
-  { label: "Contact & Support", to: "/contact" },
-];
-
-const LEGAL_LINKS = [
-  { label: "Terms", to: "/legal" },
-  { label: "Privacy Policy", to: "/legal" },
-  { label: "Cookies", to: "/legal" },
 ];
 
 const Footer = () => {
@@ -58,7 +38,7 @@ const Footer = () => {
              
                <img
   src={"logo.jpeg"}
-  alt="Rental King"
+  alt="RentalKing"
   className="rk-logo__img"
 />
               RentalKing
@@ -69,9 +49,7 @@ const Footer = () => {
             </p>
             <div className="rk-footer__socials">
               <a href="https://www.facebook.com/share/1D11o5YmR5/?mibextid=wwXIfr" aria-label="Facebook"><FacebookIcon /></a>
-              <a href="#" aria-label="Twitter"><TwitterIcon /></a>
               <a href="https://www.instagram.com/rentalkingindore?igsh=MTRtcmdrZ2RlY2dwaA==" aria-label="Instagram"><InstagramIcon /></a>
-              <a href="#" aria-label="Linkedin "><LinkedinIcon /></a>
             </div>
           </div>
 
@@ -91,9 +69,7 @@ const Footer = () => {
 
           <div className="rk-footer__col">
             <h4>Legal</h4>
-            {LEGAL_LINKS.map((l) => (
-              <Link key={l.to} to={l.to}>{l.label}</Link>
-            ))}
+            <Link to="/legal">Terms &amp; Privacy</Link>
           </div>
         </div>
 
@@ -101,14 +77,6 @@ const Footer = () => {
 
         <div className="rk-footer__bottom">
           <p>© {year} All rights reserved by RentalKing.</p>
-          <div className="rk-footer__legal">
-            {LEGAL_LINKS.map((l, i) => (
-              <span key={l.to}>
-                <Link to={l.to}>{l.label}</Link>
-                {i < LEGAL_LINKS.length - 1 && <span aria-hidden="true"> · </span>}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </footer>

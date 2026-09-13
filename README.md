@@ -1,16 +1,31 @@
-# React + Vite
+# RentalFront
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend for RentalKing, a real-estate rental listing site. Built with React 19 and Vite, it lets visitors browse and filter property listings (by location, category, status, furnishing, BHK, price and area) and gives admins a dashboard to manage properties, projects, testimonials, and site contact details. It talks to the Rental-Backend API for all data.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+```
 
-## React Compiler
+Create a `.env` file in the project root (optional — defaults to a backend on `localhost:5001` if omitted):
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+VITE_API_BASE_URL=http://localhost:5001/api
+```
 
-## Expanding the ESLint configuration
+Start the dev server (runs on `http://localhost:3000`):
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm run dev
+```
+
+Other commands:
+
+```bash
+npm run build     # production build to dist/
+npm run preview   # preview the production build locally
+npm run lint       # run ESLint
+```
+
+The Rental-Backend API must be running (see its README) for the app to load data.

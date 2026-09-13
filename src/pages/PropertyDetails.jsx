@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useProperty } from "../hooks/useRentalKingData";
+import { useContacts } from "../hooks/useContacts";
+import { contactLinks } from "../lib/contactLinks";
+import { formatPrice } from "../lib/priceFormat";
 import "./PropertyDetails.css";
 
 const BedIcon = () => (
@@ -35,6 +38,8 @@ const PropertyDetails = () => {
   const { id } = useParams();
 const { data: property, isLoading, isError } = useProperty(id);
   const [activeImage, setActiveImage] = useState(0);
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
 if (isLoading) {
   return <h2>Loading...</h2>;
 }
@@ -115,7 +120,7 @@ const gallery =
             <p className="rk-pd__description">{property.description}</p>
           </div>
 <aside className="rk-pd__sidebar">
-  <span className="rk-pd__price">{property.price}</span>
+  <span className="rk-pd__price">{formatPrice(property.priceNumeric, property.status, property.priceFrequency)}</span>
 
   <Link to="/contact" className="rk-pd__cta rk-pd__cta--gold">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -124,35 +129,39 @@ const gallery =
     Enquire Now
   </Link>
 
-  <a
-    href={`https://wa.me/919425959771?text=${encodeURIComponent(
-      `Hi RentalKing,
+  {links && (
+    <>
+      <a
+        href={links.waText(
+          `Hi RentalKing,
 
 I'm interested in this property.
 
 Property: ${property.name}
 Location: ${property.location}
-Price: ${property.price}`
-    )}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="rk-pd__cta rk-pd__cta--whatsapp"
-  >
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.52 0 .2 5.31.2 11.85c0 2.09.55 4.14 1.59 5.94L0 24l6.38-1.67a11.83 11.83 0 0 0 5.67 1.45h.01c6.53 0 11.85-5.31 11.85-11.85 0-3.16-1.23-6.13-3.39-8.45z"/>
-    </svg>
-    WhatsApp
-  </a>
+Price: ${formatPrice(property.priceNumeric, property.status, property.priceFrequency)}`
+        )}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rk-pd__cta rk-pd__cta--whatsapp"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.52 0 .2 5.31.2 11.85c0 2.09.55 4.14 1.59 5.94L0 24l6.38-1.67a11.83 11.83 0 0 0 5.67 1.45h.01c6.53 0 11.85-5.31 11.85-11.85 0-3.16-1.23-6.13-3.39-8.45z"/>
+        </svg>
+        WhatsApp
+      </a>
 
-  <a
-    href="tel:+919130065392"
-    className="rk-pd__cta rk-pd__cta--call"
-  >
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.11 5.18 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.72c.12.9.33 1.77.63 2.6a2 2 0 0 1-.45 2.11L9.1 10.9a16 16 0 0 0 6 6l1.47-1.18a2 2 0 0 1 2.11-.45c.83.3 1.7.51 2.6.63A2 2 0 0 1 22 16.92z"/>
-    </svg>
-    Call Us
-  </a>
+      <a
+        href={links.tel}
+        className="rk-pd__cta rk-pd__cta--call"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.11 5.18 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.72c.12.9.33 1.77.63 2.6a2 2 0 0 1-.45 2.11L9.1 10.9a16 16 0 0 0 6 6l1.47-1.18a2 2 0 0 1 2.11-.45c.83.3 1.7.51 2.6.63A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Call Us
+      </a>
+    </>
+  )}
 </aside>
         </div>
       </div>

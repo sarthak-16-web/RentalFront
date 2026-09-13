@@ -414,28 +414,26 @@ FEATURED PROPERTIES — ROLLING MARQUEE
     );
 }
 
-.rk-prop__track{
+.rk-prop__marquee-probe{
+    position:absolute;
+    top:0;
+    left:0;
     display:flex;
-    align-items:stretch;
-    gap:28px;
-
     width:max-content;
-
-    animation: rk-prop-scroll 34s linear infinite;
+    visibility:hidden;
+    pointer-events:none;
 }
 
-.rk-prop__marquee:hover .rk-prop__track{
-    animation-play-state:paused;
-}
-
-@keyframes rk-prop-scroll{
-    from{ transform:translateX(0); }
-    to{ transform:translateX(-50%); }
+.rk-prop__static-row{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
 }
 
 .rk-prop__track-item{
     flex:0 0 auto;
     width:380px;
+    margin-right:28px;
 }
 
 /* Bigger cards */
@@ -466,13 +464,9 @@ RESPONSIVE
 
 @media(max-width:768px){
 
-    .rk-prop__track{
-        gap:18px;
-        animation-duration:24s;
-    }
-
     .rk-prop__track-item{
         width:260px;
+        margin-right:18px;
     }
 
     .rk-prop__track-item .rk-ptile__media{
@@ -484,7 +478,7 @@ RESPONSIVE
 /* Respect reduced-motion preference */
 
 @media (prefers-reduced-motion: reduce){
-    .rk-prop__track{
+    .rk-prop__marquee .rfm-marquee{
         animation:none;
     }
     .rk-prop__marquee{

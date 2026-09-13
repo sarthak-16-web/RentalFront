@@ -1,17 +1,18 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProperties, useProjects } from "../hooks/useRentalKingData";
+import { useProperties, usePropertySchema } from "../hooks/useRentalKingData";
+import FacetSelect from "../components/FacetSelect";
+import { matches, repairSelections, sortByOrder } from "../lib/facetSelections";
+import { parseArea, computeSpan } from "../lib/ranges";
+import { formatPrice } from "../lib/priceFormat";
+import { useQuickView } from "../hooks/useQuickView";
+import ReadOnlyRange from "../components/ReadOnlyRange";
 import "./Home.css";
 
 const SearchIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
     <circle cx="11" cy="11" r="8" />
     <path d="m21 21-4.3-4.3" />
-  </svg>
-);
-const PlusIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-    <path d="M12 5v14M5 12h14" />
   </svg>
 );
 const ChevronLeft = () => (
@@ -36,66 +37,28 @@ const PinIcon = () => (
   </svg>
 );
 
-const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial", "Warehouse"];
-const STATUSES = ["For Rent", "For Sale", "Co Working", "Pre Leased"];
-const PRICE_MIN = 0, PRICE_MAX = 100000000;
-const AREA_MIN = 0, AREA_MAX = 200000;
-const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK"];
-
-const DualRange = ({ label, unit, min, max, step, valueMin, valueMax, onChangeMin, onChangeMax }) => {
-  const pctMin = ((valueMin - min) / (max - min)) * 100;
-  const pctMax = ((valueMax - min) / (max - min)) * 100;
+const FeaturedCard = ({ property }) => {
+  const { open } = useQuickView();
   return (
-    <div className="rk-range">
-      <div className="rk-range__labels"><span>{label}</span></div>
-      <div className="rk-range__values">
-        <span>{unit}{valueMin.toLocaleString()}</span>
-        <span>{unit}{valueMax.toLocaleString()}</span>
-      </div>
-      <div className="rk-range__track-wrap">
-        <div className="rk-range__track" />
-        <div className="rk-range__fill" style={{ left: `${pctMin}%`, right: `${100 - pctMax}%` }} />
-        <input type="range" min={min} max={max} step={step} value={valueMin}
-          onChange={(e) => onChangeMin(Math.min(Number(e.target.value), valueMax - step))}
-          className="rk-range__input" />
-        <input type="range" min={min} max={max} step={step} value={valueMax}
-          onChange={(e) => onChangeMax(Math.max(Number(e.target.value), valueMin + step))}
-          className="rk-range__input" />
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => open(property)}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open(property)}
+      className="rk-fcard"
+    >
+      <div className="rk-fcard__image" style={{ backgroundImage: `url(${property.coverImage})` }} />
+      <div className="rk-fcard__body">
+        <p className="rk-fcard__location"><PinIcon /> {property.location}</p>
+        <h4>{property.name}</h4>
+        <div className="rk-fcard__meta">
+          <span>{formatPrice(property.priceNumeric, property.status, property.priceFrequency)}</span>
+          {property.beds ? <span><BedIcon /> {property.beds} bed</span> : null}
+        </div>
       </div>
     </div>
   );
 };
-
-const FeaturedCard = ({ property }) => (
-  <div className="rk-fcard">
-    <div className="rk-fcard__image" style={{ backgroundImage: `url(${property.coverImage})` }} />
-    <div className="rk-fcard__body">
-      <p className="rk-fcard__location"><PinIcon /> {property.location}</p>
-      <h4>{property.name}</h4>
-      <div className="rk-fcard__meta">
-        <span>{property.price}</span>
-        {property.beds ? <span><BedIcon /> {property.beds} bed</span> : null}
-      </div>
-    </div>
-  </div>
-);
-
-const ArrowIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-    <path d="M5 12h14M13 6l6 6-6 6" />
-  </svg>
-);
-
-const ProjectRow = ({ project }) => (
-  <div className="rk-prow">
-    <div className="rk-prow__image" style={{ backgroundImage: `url(${project.image})` }} />
-    <div className="rk-prow__body">
-      <h5>{project.name}</h5>
-      <p>{project.location}</p>
-    </div>
-    <span className="rk-prow__status">{project.status}</span>
-  </div>
-);
 
 const Home = () => {
   const navigate = useNavigate();
@@ -103,35 +66,89 @@ const Home = () => {
 
   // Real data — cached by React Query, no refetch on every page switch.
   const { data: properties = [], isLoading: propertiesLoading } = useProperties();
-  const { data: projects = [] } = useProjects();
+  const { data: schema } = usePropertySchema();
 
   const featured = properties.filter((p) => p.isFeatured);
   const loading = propertiesLoading;
 
-  const [location, setLocation] = useState("");
-  const [category, setCategory] = useState("");
-  const [status, setStatus] = useState("");
-  const [furnishing, setFurnishing] = useState("");
-  const [beds, setBeds] = useState("");
-  const [features, setFeatures] = useState("");
-  const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(PRICE_MAX);
-  const [areaMin, setAreaMin] = useState(0);
-  const [areaMax, setAreaMax] = useState(AREA_MAX);
+  const [location, setLocation] = useState([]);
+  const [category, setCategory] = useState([]);
+  const [status, setStatus] = useState([]);
+  const [furnishing, setFurnishing] = useState([]);
+  const [beds, setBeds] = useState([]);
+
+  const selected = useMemo(
+    () => ({ location, category, status, furnishing, bhk: beds }),
+    [location, category, status, furnishing, beds]
+  );
+
+  const matched = useMemo(
+    () => properties.filter((p) => matches(p, selected)),
+    [properties, selected]
+  );
+
+  const priceSpan = useMemo(
+    () => computeSpan(matched, (p) => p.priceNumeric),
+    [matched]
+  );
+
+  const areaSpan = useMemo(
+    () => computeSpan(matched, (p) => parseArea(p.sqft)),
+    [matched]
+  );
+
+  // Faceted options — each dimension shows only values available given the
+  // other selections (its own excluded so it stays changeable).
+  const locations = useMemo(
+    () => [...new Set(properties.filter((p) => matches(p, { ...selected, location: [] })).map((p) => p.location?.split(",").pop()?.trim()).filter(Boolean))].sort(),
+    [properties, selected]
+  );
+  const categories = useMemo(
+    () => sortByOrder([...new Set(properties.filter((p) => matches(p, { ...selected, category: [] })).map((p) => p.category).filter(Boolean))], schema?.categories),
+    [properties, selected, schema]
+  );
+  const statuses = useMemo(
+    () => [...new Set(properties.filter((p) => matches(p, { ...selected, status: [] })).map((p) => p.status).filter(Boolean))].sort(),
+    [properties, selected]
+  );
+  const furnishingOptions = useMemo(
+    () => [...new Set(properties.filter((p) => matches(p, { ...selected, furnishing: [] })).map((p) => p.furnishing).filter(Boolean))].sort(),
+    [properties, selected]
+  );
+  const bhkOptions = useMemo(
+    () => [...new Set(properties.filter((p) => matches(p, { ...selected, bhk: [] })).map((p) => p.bhk).filter(Boolean))].sort(
+      (a, b) => parseInt(a, 10) - parseInt(b, 10)
+    ),
+    [properties, selected]
+  );
+
+  const toggleSelection = (dim, value) => {
+    const cur = selected[dim];
+    const toggled = {
+      ...selected,
+      [dim]: cur.includes(value)
+        ? cur.filter((v) => v !== value)
+        : [...cur, value],
+    };
+    const next = repairSelections(properties, toggled);
+    setLocation(next.location);
+    setCategory(next.category);
+    setStatus(next.status);
+    setFurnishing(next.furnishing);
+    setBeds(next.bhk);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (location) params.set("location", location);
-    if (category) params.set("category", category);
-    if (furnishing) params.set("furnishing", furnishing);
-    if (status) params.set("status", status);
-    if (beds) params.set("beds", beds);
-    if (features) params.set("features", features);
-    params.set("priceMin", priceMin);
-    params.set("priceMax", priceMax);
-    params.set("areaMin", areaMin);
-    params.set("areaMax", areaMax);
+    const setArr = (key, arr) => {
+      if (arr.length) params.set(key, arr.join(","));
+    };
+    setArr("location", location);
+    setArr("category", category);
+    setArr("furnishing", furnishing);
+    setArr("status", status);
+    setArr("beds", beds);
     navigate(`/properties?${params.toString()}`);
   };
 
@@ -152,56 +169,47 @@ const Home = () => {
 
           <form className="rk-hh__card" onSubmit={handleSearch}>
             <div className="rk-hh__row rk-hh__row--2">
-              <select value={location} onChange={(e) => setLocation(e.target.value)}>
-                <option value="">Choose Location</option>
-                <option value="Indore">Indore</option>
-                <option value="Jabalpur">Prithampur</option>
-                <option value="Ujjain">Ujjain</option>
-                <option value="Bhopal">Bhopal</option>
-              </select>
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="">Property Type</option>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <FacetSelect
+                label="Choose Location"
+                selected={location}
+                options={locations}
+                onToggle={(v) => toggleSelection("location", v)}
+              />
+              <FacetSelect
+                label="Property Type"
+                selected={category}
+                options={categories}
+                onToggle={(v) => toggleSelection("category", v)}
+              />
             </div>
 
             <div className="rk-hh__row rk-hh__row--3">
-              <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                <option value="">Property Status</option>
-                {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-              <select
-                value={furnishing}
-                onChange={(e) => setFurnishing(e.target.value)}
-              >
-                <option value="">Furnishing</option>
-                <option value="Furnished">Furnished</option>
-                <option value="Semi Furnished">Semi Furnished</option>
-                <option value="Unfurnished">Unfurnished</option>
-              </select>
-              <select value={beds} onChange={(e) => setBeds(e.target.value)}>
-                <option value="">BHK</option>
-                {BHK_OPTIONS.map((b) => (
-                  <option key={b} value={b}>
-                    {b}
-                  </option>
-                ))}
-              </select>
+              <FacetSelect
+                label="Property Status"
+                selected={status}
+                options={statuses}
+                onToggle={(v) => toggleSelection("status", v)}
+              />
+              <FacetSelect
+                label="Furnishing"
+                selected={furnishing}
+                options={furnishingOptions}
+                onToggle={(v) => toggleSelection("furnishing", v)}
+              />
+              <FacetSelect
+                label="BHK"
+                selected={beds}
+                options={bhkOptions}
+                onToggle={(v) => toggleSelection("bhk", v)}
+              />
             </div>
 
-            <DualRange label="Price Range" unit="₹" min={PRICE_MIN} max={PRICE_MAX} step={500}
-              valueMin={priceMin} valueMax={priceMax} onChangeMin={setPriceMin} onChangeMax={setPriceMax} />
-            <DualRange label="Area (Sq Ft)" unit="" min={AREA_MIN} max={AREA_MAX} step={50}
-              valueMin={areaMin} valueMax={areaMax} onChangeMin={setAreaMin} onChangeMax={setAreaMax} />
-
-            <div className="rk-hh__row rk-hh__row--features">
-              <div className="rk-hh__features">
-                <PlusIcon />
-                <input type="text" placeholder="Look for certain features"
-                  value={features} onChange={(e) => setFeatures(e.target.value)} />
-              </div>
-              <button type="submit" className="rk-hh__submit"><SearchIcon /> Search</button>
+            <div className="rk-hh__row rk-hh__row--2 rk-hh__ranges">
+              <ReadOnlyRange label="Price Range" unit="₹" {...priceSpan} />
+              <ReadOnlyRange label="Area (Sq Ft)" {...areaSpan} />
             </div>
+
+            <button type="submit" className="rk-hh__submit"><SearchIcon /> Find me my dream property!</button>
           </form>
         </div>
 
@@ -227,20 +235,6 @@ const Home = () => {
 
             {!loading &&
               featured.map((p) => <FeaturedCard key={p._id} property={p} />)}
-          </div>
-
-          <div className="rk-hh__upcoming">
-            <div className="rk-hh__right-head rk-hh__right-head--tight">
-              <h3>Upcoming Projects</h3>
-              <a href="/upcoming" className="rk-hh__viewall">
-                View all <ArrowIcon />
-              </a>
-            </div>
-            <div className="rk-hh__plist">
-              {projects.map((p) => (
-                <ProjectRow key={p._id} project={p} />
-              ))}
-            </div>
           </div>
         </div>
       </div>
