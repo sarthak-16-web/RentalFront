@@ -1,5 +1,6 @@
 .rk-pcard {
   display: block;
+  cursor: pointer;
   background: var(--color-white);
   border-radius: var(--radius-lg);
   overflow: hidden;

@@ -3,27 +3,26 @@ import "./App.css";
 import "./styles/variable.css";
 
 import { AdminAuthProvider } from "./context/AdminAuthContext";
+import { QuickViewProvider } from "./context/QuickViewContext";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import AppPreloader from "./components/AppPreloader";
+import PropertyQuickView from "./components/PropertyQuickView";
 // Components
 import Navbar from "./pages/Navbar";
-import Fotter from "./pages/Fotter";
+import Footer from "./pages/Footer";
 import ScrollToTop from "./components/Scrolltop";
 
 // Public Pages
 import Home from "./pages/Home";
 import PropertiesHome from "./pages/PropertiesHome";
-import TeamPreview from "./pages/TeamPreview";
 import PartnersMarquee from "./pages/Partnersmarquee";
 import TestimonialsHome from "./pages/TestimonialsHome";
 import Properties from "./pages/Properties";
 import PropertyDetails from "./pages/PropertyDetails";
-import Testimonials from "./pages/Testimonials";
 import ContactUs from "./pages/Contactus";
 import Collaboration from "./pages/Collaboration";
 import TeamMemberDetails from "./pages/Teammemberdetails";
-import UpcomingProjects from "./pages/Upcomingprojects";
-import FeaturedProperties from "./pages/FeaturedProperties";
+import Projects from "./pages/Projects";
 import Legalpage from "./pages/Legalpage";
 
 // Admin Pages
@@ -35,7 +34,9 @@ function App() {
     <BrowserRouter>
     <AppPreloader />
       <AdminAuthProvider>
+      <QuickViewProvider>
         <ScrollToTop />
+        <PropertyQuickView />
 
         <Routes>
           {/* ================= PUBLIC WEBSITE ================= */}
@@ -47,10 +48,9 @@ function App() {
                 <Navbar />
                 <Home />
                 <PropertiesHome />
-                <TeamPreview />
                 <PartnersMarquee />
                 <TestimonialsHome />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -61,7 +61,7 @@ function App() {
               <>
                 <Navbar />
                 <Properties />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -72,18 +72,7 @@ function App() {
               <>
                 <Navbar />
                 <PropertyDetails />
-                <Fotter />
-              </>
-            }
-          />
-
-          <Route
-            path="/testimonials"
-            element={
-              <>
-                <Navbar />
-                <Testimonials />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -94,7 +83,7 @@ function App() {
               <>
                 <Navbar />
                 <ContactUs />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -105,7 +94,7 @@ function App() {
               <>
                 <Navbar />
                 <Collaboration />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -116,29 +105,18 @@ function App() {
               <>
                 <Navbar />
                 <TeamMemberDetails />
-                <Fotter />
+                <Footer />
               </>
             }
           />
 
           <Route
-            path="/upcoming"
+            path="/projects"
             element={
               <>
                 <Navbar />
-                <UpcomingProjects />
-                <Fotter />
-              </>
-            }
-          />
-
-          <Route
-            path="/featured"
-            element={
-              <>
-                <Navbar />
-                <FeaturedProperties />
-                <Fotter />
+                <Projects />
+                <Footer />
               </>
             }
           />
@@ -149,7 +127,7 @@ function App() {
               <>
                 <Navbar />
                 <Legalpage />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -167,6 +145,7 @@ function App() {
             }
           />
         </Routes>
+      </QuickViewProvider>
       </AdminAuthProvider>
     </BrowserRouter>
   );

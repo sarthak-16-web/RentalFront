@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import apiClient from "../lib/apiClient";
 
 // =======================
@@ -10,9 +10,25 @@ export const useProperties = () =>
     queryKey: ["properties"],
 
     queryFn: async () => {
-      const { data } = await apiClient.get("/api/property/get-all");
+      const { data } = await apiClient.get("/property/get-all");
       return data.properties ?? [];
     },
+  });
+
+// =======================
+// Property Schema
+// =======================
+
+export const usePropertySchema = () =>
+  useQuery({
+    queryKey: ["propertySchema"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/property/schema");
+      return data;
+    },
+
+    staleTime: 5 * 60 * 1000,
   });
 
 // =======================
@@ -39,7 +55,7 @@ export const useProperty = (id) => {
       }
 
       // Direct URL access fallback
-      const { data } = await apiClient.get(`/api/property/${id}`);
+      const { data } = await apiClient.get(`/property/${id}`);
 
       return data.property;
     },
@@ -57,9 +73,21 @@ export const useProjects = () =>
     queryKey: ["projects"],
 
     queryFn: async () => {
-      const { data } = await apiClient.get("/api/project/get-all");
+      const { data } = await apiClient.get("/project/get-all");
       return data.projects ?? [];
     },
+  });
+
+export const useProjectSchema = () =>
+  useQuery({
+    queryKey: ["projectSchema"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/project/schema");
+      return data;
+    },
+
+    staleTime: 5 * 60 * 1000,
   });
 
 // =======================
@@ -71,7 +99,49 @@ export const useTestimonials = () =>
     queryKey: ["testimonials"],
 
     queryFn: async () => {
-      const { data } = await apiClient.get("/api/testimonial/get-all");
+      const { data } = await apiClient.get("/testimonial/get-approved");
       return data.testimonials ?? [];
+    },
+  });
+
+export const useSubmitTestimonial = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ name, review }) => {
+      const { data } = await apiClient.post("/testimonial/submit", { name, review });
+      return data.testimonial;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+    },
+  });
+};
+
+// =======================
+// Team
+// =======================
+
+export const useTeam = () =>
+  useQuery({
+    queryKey: ["team"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/team/get-all");
+      return data.members ?? [];
+    },
+  });
+
+// =======================
+// Partners
+// =======================
+
+export const usePartners = () =>
+  useQuery({
+    queryKey: ["partners"],
+
+    queryFn: async () => {
+      const { data } = await apiClient.get("/partner/get-all");
+      return data.partners ?? [];
     },
   });

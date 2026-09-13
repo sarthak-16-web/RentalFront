@@ -118,11 +118,3 @@
 .rk-footer__bottom p {
   margin: 0;
 }
-
-.rk-footer__legal a {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.rk-footer__legal a:hover {
-  color: var(--color-gold-400);
-}

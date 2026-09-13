@@ -3,48 +3,6 @@
   padding: 32px 0 36px;
   overflow: hidden;
 }
-.rk-partners__item {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 40px;
-}
-
-.rk-partners__logo {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-}
-
-.rk-partners__item span {
-  color: rgba(255,255,255,.75);
-  font-weight: 600;
-  white-space: nowrap;
-}
-.rk-partners__item {
-  flex-shrink: 0;
-  padding: 0 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.rk-partners__logo {
-  height: 42px;
-  width: auto;
-  max-width: 170px;
-  object-fit: contain;
-  filter: grayscale(100%);
-  opacity: 0.75;
-  transition: all 0.3s ease;
-}
-
-.rk-partners__logo:hover {
-  filter: grayscale(0%);
-  opacity: 1;
-  transform: scale(1.05);
-}
 
 .rk-partners__label {
   text-align: center;
@@ -57,6 +15,7 @@
 }
 
 .rk-partners__viewport {
+  position: relative;
   overflow: hidden;
   width: 100%;
   /* soft fade at both edges so the loop doesn't look like a hard cut */
@@ -76,42 +35,54 @@
   );
 }
 
-.rk-partners__track {
+.rk-partners__probe {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   width: max-content;
-  animation: rk-marquee 28s linear infinite;
+  visibility: hidden;
+  pointer-events: none;
 }
 
-.rk-partners__track:hover {
-  animation-play-state: paused;
+.rk-partners__static-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .rk-partners__item {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 0 40px;
-  font-family: var(--font-display);
+}
+
+.rk-partners__logo {
+  height: 42px;
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.75;
+  transition: all 0.3s ease;
+}
+
+.rk-partners__logo:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.rk-partners__item span {
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 600;
-  font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.4);
   white-space: nowrap;
-  transition: color 0.2s ease;
-}
-
-.rk-partners__item:hover {
-  color: var(--color-gold-400);
-}
-
-@keyframes rk-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rk-partners__track {
+  .rk-partners .rfm-marquee {
     animation: none;
   }
   .rk-partners__viewport {

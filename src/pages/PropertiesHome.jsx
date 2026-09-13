@@ -1,9 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import MarqueeModule from "react-fast-marquee";
 import Reveal from "../components/Reveal";
  import heroBuilding from "/imagecopy.png";
 import "./PropertiesHome.css";
-import { Link, useNavigate } from "react-router-dom";
-import { useProperties } from "../hooks/useRentalKingData";
+import { Link } from "react-router-dom";
+import { useProperties, usePropertySchema } from "../hooks/useRentalKingData";
+import { useContacts } from "../hooks/useContacts";
+import { useQuickView } from "../hooks/useQuickView";
+import { contactLinks } from "../lib/contactLinks";
+import { formatPrice } from "../lib/priceFormat";
+
+// This build's CJS->ESM interop doesn't unwrap the `default` export.
+const Marquee = MarqueeModule.default ?? MarqueeModule;
 const ArrowIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -62,31 +70,41 @@ const ArrowIcon = () => (
 //   },
 // ];
 
-const CATEGORY_TAGS = ["All", "Villa", "Apartment", "House", "Commercial", "Warehouse"];
-
-const PropertyTile = ({ p }) => (
-  <Link to={`/properties/${p._id}`} className="rk-ptile">
-    <div className="rk-ptile__media">
-      <span className="heart">♡</span>
-      <img
-  src={p.coverImage || "https://placehold.co/600x400?text=No+Image"}
-  alt={p.name}
-  loading="lazy"
-/>
-    </div>
-    <div className="rk-ptile__caption">
-      <div>
-        <h4>{p.name}</h4>
-        <span>{p.location}</span>
+const PropertyTile = ({ p }) => {
+  const { open } = useQuickView();
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => open(p)}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open(p)}
+      className="rk-ptile"
+    >
+      <div className="rk-ptile__media">
+        <span className="heart">♡</span>
+        <img
+          src={p.coverImage || "https://placehold.co/600x400?text=No+Image"}
+          alt={p.name}
+          loading="lazy"
+        />
       </div>
-      <strong>{p.price}</strong>
+      <div className="rk-ptile__caption">
+        <div>
+          <h4>{p.name}</h4>
+          <span>{p.location}</span>
+        </div>
+        <strong>{formatPrice(p.priceNumeric, p.status, p.priceFrequency)}</strong>
+      </div>
     </div>
-  </Link>
-);
+  );
+};
 
 const PropertiesHome = () => {
-  const navigate = useNavigate();
   const [activeTag, setActiveTag] = useState("All");
+  const { data: contacts } = useContacts();
+  const links = contactLinks(contacts);
+  const { data: schema } = usePropertySchema();
+  const categoryTags = ["All", ...(schema?.categories || [])];
 const {
   data: properties = [],
   isLoading,
@@ -102,11 +120,26 @@ const {
   return filtered;
 }, [properties, activeTag]);
 
-  // Duplicate the list so the marquee track can loop seamlessly (0% -> -50%)
-  const trackItems = useMemo(
-    () => [...visibleProperties, ...visibleProperties],
-    [visibleProperties]
-  );
+  // Only scroll the marquee if the row's real content is wider than the
+  // space available - otherwise autoFill just pads it out with repeats of
+  // the same one or two cards, which reads as one photo looping in place.
+  const marqueeWrapRef = useRef(null);
+  const marqueeProbeRef = useRef(null);
+  const [needsMarquee, setNeedsMarquee] = useState(false);
+
+  useEffect(() => {
+    const wrap = marqueeWrapRef.current;
+    const probe = marqueeProbeRef.current;
+    if (!wrap || !probe) return;
+
+    const check = () => setNeedsMarquee(probe.scrollWidth > wrap.clientWidth);
+    check();
+
+    const observer = new ResizeObserver(check);
+    observer.observe(wrap);
+    return () => observer.disconnect();
+  }, [visibleProperties]);
+
 if (isLoading) {
   return (
     <section className="rk-prop">
@@ -133,7 +166,7 @@ if (isError) {
         <img
           className="rk-hero__img"
           src={heroBuilding}
-          alt="RK Estates flagship commercial tower at dusk"
+          alt="RentalKing flagship commercial tower at dusk"
         />
         <div className="rk-hero__scrim" />
 
@@ -160,41 +193,18 @@ if (isError) {
              <Link to="/properties" className="rk-prop__cta">
   Explore Properties <ArrowIcon />
 </Link>
+     {links && (
      <a
-  href="https://wa.me/+919425959771?text=Hi%20RK%20Estate,%20I'm%20interested%20in%20your%20properties.%20Please%20contact%20me."
+  href={links.waText("Hi RentalKing, I'm interested in your properties. Please contact me.")}
   target="_blank"
   rel="noopener noreferrer"
   className="rk-hero__cta-ghost"
 >
   Talk To An Advisor
 </a>
+)}
             </div>
           </Reveal>
-
-          <Reveal direction="up" delay={260}>
-            <div className="rk-prop__tags rk-hero__tags">
-              {CATEGORY_TAGS.map((tag) => (
-                <button
-  key={tag}
-  type="button"
-  className={`rk-prop__tag${activeTag === tag ? " is-active" : ""}`}
-  onClick={() => {
-  navigate("/properties", {
-    state: {
-      category: tag,
-    },
-  });
-}}
->
-  {tag}
-</button>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-
-        <div className="rk-hero__scrollcue" aria-hidden="true">
-          <span />
         </div>
       </section>
 
@@ -212,24 +222,59 @@ if (isError) {
                 updated weekly. Tap any listing for the full tour.
               </p>
             </Reveal>
+
+            <Reveal direction="up" delay={140}>
+              <div className="rk-prop__tags">
+                {categoryTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className={`rk-prop__tag${activeTag === tag ? " is-active" : ""}`}
+                    onClick={() => setActiveTag(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </Reveal>
           </div>
 
           <Reveal direction="up" delay={90}>
-            <div className="rk-prop__marquee">
-              <div className="rk-prop__track">
-                {trackItems.map((p, i) => (
-                  <div className="rk-prop__track-item" key={`${p._id}-${i}`}>
+            <div ref={marqueeWrapRef} className="rk-prop__marquee">
+              {/* Hidden probe: measures the row's real width so we only
+                  animate when there's more content than fits. */}
+              <div ref={marqueeProbeRef} className="rk-prop__marquee-probe" aria-hidden="true">
+                {visibleProperties.map((p) => (
+                  <div className="rk-prop__track-item" key={p._id}>
                     <PropertyTile p={p} />
                   </div>
                 ))}
               </div>
+
+              {needsMarquee ? (
+                <Marquee pauseOnHover autoFill speed={60}>
+                  {visibleProperties.map((p) => (
+                    <div className="rk-prop__track-item" key={p._id}>
+                      <PropertyTile p={p} />
+                    </div>
+                  ))}
+                </Marquee>
+              ) : (
+                <div className="rk-prop__static-row">
+                  {visibleProperties.map((p) => (
+                    <div className="rk-prop__track-item" key={p._id}>
+                      <PropertyTile p={p} />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Reveal>
 
           <Reveal direction="up" delay={120}>
             <div className="rk-prop__more">
               <Link
-  to="/featured"
+  to="/properties"
   className="rk-hero__cta-ghost rk-prop__more-btn"
 >
   View All Properties <ArrowIcon />
