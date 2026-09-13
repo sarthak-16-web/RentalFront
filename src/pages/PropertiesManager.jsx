@@ -69,7 +69,7 @@ const repairBeds = (schema, bhk, current) => {
   return currentNum >= range.min ? currentNum : range.min;
 };
 
-const PropertiesManager = ({ featuredOnly }) => {
+const PropertiesManager = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -112,7 +112,6 @@ const PropertiesManager = ({ featuredOnly }) => {
     fetchSchema();
   }, []);
 
-  const visible = featuredOnly ? properties.filter((p) => p.isFeatured) : properties;
 
   const openAddForm = () => {
     const category = schema.categories[0] || "";
@@ -244,12 +243,10 @@ const PropertiesManager = ({ featuredOnly }) => {
   return (
     <div>
       <div className="rk-amgr__head">
-        <h2>{featuredOnly ? "Featured Properties" : "Properties"}</h2>
-        {!featuredOnly && (
-          <button className="rk-amgr__add" onClick={openAddForm} disabled={schemaLoading}>
-            + Add Property
-          </button>
-        )}
+        <h2>Properties</h2>
+        <button className="rk-amgr__add" onClick={openAddForm} disabled={schemaLoading}>
+          + Add Property
+        </button>
       </div>
 
       {error && <div className="rk-amgr__msg rk-amgr__msg--error">{error}</div>}
@@ -401,10 +398,8 @@ const PropertiesManager = ({ featuredOnly }) => {
       <div className="rk-amgr__table-wrap">
         {loading ? (
           <div className="rk-amgr__empty">Loading...</div>
-        ) : visible.length === 0 ? (
-          <div className="rk-amgr__empty">
-            {featuredOnly ? "No featured properties yet." : "No properties yet."}
-          </div>
+        ) : properties.length === 0 ? (
+          <div className="rk-amgr__empty">No properties yet.</div>
         ) : (
           <table className="rk-amgr__table">
             <thead>
@@ -418,7 +413,7 @@ const PropertiesManager = ({ featuredOnly }) => {
               </tr>
             </thead>
             <tbody>
-              {visible.map((p) => (
+              {properties.map((p) => (
                 <tr key={p._id}>
                   <td><img src={p.coverImage} alt={p.name} className="rk-amgr__thumb" /></td>
                   <td>{p.name}<br /><span className="rk-amgr__badge">{p.location}</span></td>

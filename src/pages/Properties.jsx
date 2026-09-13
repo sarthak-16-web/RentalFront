@@ -14,7 +14,6 @@ const EMPTY_FILTERS = {
   status: [],
   furnishing: [],
   bhk: [],
-  featured: false,
 };
 
 const parseParams = (searchParams) => {
@@ -33,7 +32,6 @@ const parseParams = (searchParams) => {
     status: multi("status"),
     furnishing: multi("furnishing"),
     bhk: multi("beds"),
-    featured: searchParams.get("featured") === "1",
     price: { min: num("priceMin"), max: num("priceMax") },
     area: { min: num("areaMin"), max: num("areaMax") },
   };
@@ -60,7 +58,6 @@ const Properties = () => {
 
   const filterList = (list, f) => {
     return list.filter((p) => {
-      if (f.featured && !p.isFeatured) return false;
       if (f.location.length && !f.location.includes(cityOf(p))) return false;
       if (f.category.length && !f.category.includes(p.category)) return false;
       if (f.status.length && !f.status.includes(p.status)) return false;
@@ -164,8 +161,6 @@ const Properties = () => {
     Object.entries(f).forEach(([key, val]) => {
       if (Array.isArray(val) && val.length) {
         params.set(key === "bhk" ? "beds" : key, val.join(","));
-      } else if (key === "featured" && val) {
-        params.set("featured", "1");
       }
     });
     if (pr.min != null) params.set("priceMin", pr.min);
@@ -190,15 +185,6 @@ const Properties = () => {
     setSearchParams(buildParams(repaired, FULL_SLIDER, FULL_SLIDER), { replace: true });
   };
 
-  const toggleFeatured = () => {
-    const toggled = { ...filters, featured: !filters.featured };
-    const repaired = repairSelections(properties, toggled);
-    setFilters(repaired);
-    setPriceSlider(FULL_SLIDER);
-    setAreaSlider(FULL_SLIDER);
-    setSearchParams(buildParams(repaired, FULL_SLIDER, FULL_SLIDER), { replace: true });
-  };
-
   const setPrice = (slider) => {
     setPriceSlider(slider);
     setSearchParams(buildParams(filters, slider, areaSlider), { replace: true });
@@ -218,7 +204,6 @@ const Properties = () => {
 
   const hasActiveFilters =
     Object.values(filters).some((v) => Array.isArray(v) && v.length > 0) ||
-    filters.featured ||
     priceSlider.min != null ||
     priceSlider.max != null ||
     areaSlider.min != null ||
@@ -236,15 +221,6 @@ const Properties = () => {
       <div className="rk-properties__body">
         {/* Filter bar */}
         <div className="rk-pfilters">
-          <div className="rk-pfilters__featured">
-            <button
-              type="button"
-              className={`rk-pfilters__featured-btn${filters.featured ? " is-active" : ""}`}
-              onClick={toggleFeatured}
-            >
-              ★ Featured only
-            </button>
-          </div>
           <div className="rk-pfilters__row rk-pfilters__row--2">
             <FacetSelect
               label="Locations"

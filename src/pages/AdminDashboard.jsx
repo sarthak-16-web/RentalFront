@@ -12,7 +12,6 @@ import "./AdminDashboard.css";
 
 const TABS = [
   { key: "properties", label: "Properties" },
-  { key: "featured", label: "Featured Properties" },
   { key: "projects", label: "Upcoming Projects" },
   { key: "testimonials", label: "Testimonials" },
   { key: "contacts", label: "Contact Details" },
@@ -57,8 +56,7 @@ const AdminDashboard = () => {
       </aside>
 
       <main className="rk-adash__content">
-        {activeTab === "properties" && <PropertiesManager featuredOnly={false} />}
-        {activeTab === "featured" && <PropertiesManager featuredOnly={true} />}
+        {activeTab === "properties" && <PropertiesManager />}
         {activeTab === "projects" && <ProjectsManager />}
         {activeTab === "testimonials" && <TestimonialsManager />}
         {activeTab === "contacts" && <ContactSettings />}

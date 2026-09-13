@@ -46,38 +46,6 @@
   box-shadow: var(--shadow-soft);
 }
 
-.rk-pfilters__featured {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 12px;
-}
-
-.rk-pfilters__featured-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid var(--color-slate-200);
-  background: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-slate-500);
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.rk-pfilters__featured-btn:hover {
-  border-color: var(--color-gold-500);
-  color: var(--color-gold-500);
-}
-
-.rk-pfilters__featured-btn.is-active {
-  background: var(--color-gold-500);
-  border-color: var(--color-gold-500);
-  color: #111;
-}
-
 .rk-pfilters__row {
   display: grid;
   gap: 12px;
