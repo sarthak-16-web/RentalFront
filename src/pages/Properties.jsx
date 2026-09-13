@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import PropertyCard from "../components/PropertyCard";
 import "./Properties.css";
 import { useProperties } from "../hooks/useRentalKingData";
 const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial" , "Warehouse" , "Flats"];
-
-const SCROLL_KEY = "rk-properties-scroll";
 
 const Properties = () => {
   const [category, setCategory] = useState("");
@@ -42,29 +40,6 @@ const Properties = () => {
   };
 
   const hasActiveFilters = category || location || minBeds || minPrice || maxPrice;
-
-  // Keep track of scroll position while the user browses this page.
-  useEffect(() => {
-    const handleScroll = () => {
-      sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Once the (filtered) list has actually rendered, jump back to where the
-  // user left off — instead of landing at the top of the page.
-  const restoredRef = useRef(false);
-  useEffect(() => {
-    if (isLoading || restoredRef.current) return;
-    const saved = sessionStorage.getItem(SCROLL_KEY);
-    if (saved) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, Number(saved));
-      });
-    }
-    restoredRef.current = true;
-  }, [isLoading, filtered.length]);
 
   return (
     <div className="rk-properties">
