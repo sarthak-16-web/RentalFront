@@ -19,7 +19,6 @@ import PartnersMarquee from "./pages/Partnersmarquee";
 import TestimonialsHome from "./pages/TestimonialsHome";
 import Properties from "./pages/Properties";
 import PropertyDetails from "./pages/PropertyDetails";
-import Testimonials from "./pages/Testimonials";
 import ContactUs from "./pages/Contactus";
 import Collaboration from "./pages/Collaboration";
 import TeamMemberDetails from "./pages/Teammemberdetails";
@@ -73,17 +72,6 @@ function App() {
               <>
                 <Navbar />
                 <PropertyDetails />
-                <Footer />
-              </>
-            }
-          />
-
-          <Route
-            path="/testimonials"
-            element={
-              <>
-                <Navbar />
-                <Testimonials />
                 <Footer />
               </>
             }

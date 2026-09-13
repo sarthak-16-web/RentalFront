@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import apiClient from "../lib/apiClient";
 
 // =======================
@@ -99,10 +99,24 @@ export const useTestimonials = () =>
     queryKey: ["testimonials"],
 
     queryFn: async () => {
-      const { data } = await apiClient.get("/testimonial/get-all");
+      const { data } = await apiClient.get("/testimonial/get-approved");
       return data.testimonials ?? [];
     },
   });
+
+export const useSubmitTestimonial = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ name, review }) => {
+      const { data } = await apiClient.post("/testimonial/submit", { name, review });
+      return data.testimonial;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+    },
+  });
+};
 
 // =======================
 // Team
