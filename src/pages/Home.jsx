@@ -1,13 +1,11 @@
 import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProperties, useProjects, usePropertySchema } from "../hooks/useRentalKingData";
+import { useProperties, usePropertySchema } from "../hooks/useRentalKingData";
 import FacetSelect from "../components/FacetSelect";
 import { matches, repairSelections, sortByOrder } from "../lib/facetSelections";
 import { parseArea, computeSpan } from "../lib/ranges";
 import { formatPrice } from "../lib/priceFormat";
 import { useQuickView } from "../hooks/useQuickView";
-import { useContacts } from "../hooks/useContacts";
-import { contactLinks } from "../lib/contactLinks";
 import ReadOnlyRange from "../components/ReadOnlyRange";
 import "./Home.css";
 
@@ -62,65 +60,12 @@ const FeaturedCard = ({ property }) => {
   );
 };
 
-const ArrowIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-    <path d="M5 12h14M13 6l6 6-6 6" />
-  </svg>
-);
-const WhatsappIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.52 0 .2 5.31.2 11.85c0 2.09.55 4.14 1.59 5.94L0 24l6.38-1.67a11.83 11.83 0 0 0 5.67 1.45h.01c6.53 0 11.85-5.31 11.85-11.85 0-3.16-1.23-6.13-3.39-8.45z" />
-  </svg>
-);
-const CallIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.11 5.18 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.72c.12.9.33 1.77.63 2.6a2 2 0 0 1-.45 2.11L9.1 10.9a16 16 0 0 0 6 6l1.47-1.18a2 2 0 0 1 2.11-.45c.83.3 1.7.51 2.6.63A2 2 0 0 1 22 16.92z" />
-  </svg>
-);
-
-const ProjectRow = ({ project }) => {
-  const { data: contacts } = useContacts();
-  const links = contactLinks(contacts);
-
-  return (
-    <div className="rk-prow">
-      <div className="rk-prow__image" style={{ backgroundImage: `url(${project.images?.[0]})` }} />
-      <div className="rk-prow__body">
-        <h5>{project.name}</h5>
-      </div>
-      <div className="rk-prow__actions">
-        <a href="/contact" className="rk-prow__action rk-prow__action--gold" title="Enquire Now" aria-label="Enquire Now">
-          <ArrowIcon />
-        </a>
-        {links && (
-          <>
-            <a
-              href={links.waText(`Hi RentalKing,\n\nI'm interested in this project.\n\nProject: ${project.name}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rk-prow__action rk-prow__action--whatsapp"
-              title="WhatsApp"
-              aria-label="WhatsApp"
-            >
-              <WhatsappIcon />
-            </a>
-            <a href={links.tel} className="rk-prow__action rk-prow__action--call" title="Call" aria-label="Call">
-              <CallIcon />
-            </a>
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-
 const Home = () => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
 
   // Real data — cached by React Query, no refetch on every page switch.
   const { data: properties = [], isLoading: propertiesLoading } = useProperties();
-  const { data: projects = [] } = useProjects();
   const { data: schema } = usePropertySchema();
 
   const featured = properties.filter((p) => p.isFeatured);
@@ -290,20 +235,6 @@ const Home = () => {
 
             {!loading &&
               featured.map((p) => <FeaturedCard key={p._id} property={p} />)}
-          </div>
-
-          <div className="rk-hh__upcoming">
-            <div className="rk-hh__right-head rk-hh__right-head--tight">
-              <h3>Projects</h3>
-              <a href="/projects" className="rk-hh__viewall">
-                View all <ArrowIcon />
-              </a>
-            </div>
-            <div className="rk-hh__plist">
-              {projects.map((p) => (
-                <ProjectRow key={p._id} project={p} />
-              ))}
-            </div>
           </div>
         </div>
       </div>
