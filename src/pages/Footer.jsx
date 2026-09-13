@@ -27,12 +27,6 @@ const COMPANY_LINKS = [
   { label: "Collaboration", to: "/collaboration" },
 ];
 
-const LEGAL_LINKS = [
-  { label: "Terms", to: "/legal" },
-  { label: "Privacy Policy", to: "/legal" },
-  { label: "Cookies", to: "/legal" },
-];
-
 const Footer = () => {
   const year = new Date().getFullYear();
 
@@ -76,9 +70,7 @@ const Footer = () => {
 
           <div className="rk-footer__col">
             <h4>Legal</h4>
-            {LEGAL_LINKS.map((l) => (
-              <Link key={l.to} to={l.to}>{l.label}</Link>
-            ))}
+            <Link to="/legal">Terms &amp; Privacy</Link>
           </div>
         </div>
 
@@ -86,14 +78,6 @@ const Footer = () => {
 
         <div className="rk-footer__bottom">
           <p>© {year} All rights reserved by RentalKing.</p>
-          <div className="rk-footer__legal">
-            {LEGAL_LINKS.map((l, i) => (
-              <span key={l.to}>
-                <Link to={l.to}>{l.label}</Link>
-                {i < LEGAL_LINKS.length - 1 && <span aria-hidden="true"> · </span>}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </footer>
