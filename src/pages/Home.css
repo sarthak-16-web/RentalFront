@@ -160,6 +160,7 @@
 
 .rk-fcard {
   flex: 0 0 100%;
+  cursor: pointer;
   scroll-snap-align: start;
   background: var(--color-white);
   border-radius: var(--radius-lg);

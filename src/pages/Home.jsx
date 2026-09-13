@@ -5,6 +5,7 @@ import FacetSelect from "../components/FacetSelect";
 import { matches, repairSelections, sortByOrder } from "../lib/facetSelections";
 import { parseArea, computeSpan } from "../lib/ranges";
 import { formatPrice } from "../lib/priceFormat";
+import { useQuickView } from "../hooks/useQuickView";
 import ReadOnlyRange from "../components/ReadOnlyRange";
 import "./Home.css";
 
@@ -36,19 +37,28 @@ const PinIcon = () => (
   </svg>
 );
 
-const FeaturedCard = ({ property }) => (
-  <div className="rk-fcard">
-    <div className="rk-fcard__image" style={{ backgroundImage: `url(${property.coverImage})` }} />
-    <div className="rk-fcard__body">
-      <p className="rk-fcard__location"><PinIcon /> {property.location}</p>
-      <h4>{property.name}</h4>
-      <div className="rk-fcard__meta">
-        <span>{formatPrice(property.priceNumeric, property.status, property.priceFrequency)}</span>
-        {property.beds ? <span><BedIcon /> {property.beds} bed</span> : null}
+const FeaturedCard = ({ property }) => {
+  const { open } = useQuickView();
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => open(property)}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open(property)}
+      className="rk-fcard"
+    >
+      <div className="rk-fcard__image" style={{ backgroundImage: `url(${property.coverImage})` }} />
+      <div className="rk-fcard__body">
+        <p className="rk-fcard__location"><PinIcon /> {property.location}</p>
+        <h4>{property.name}</h4>
+        <div className="rk-fcard__meta">
+          <span>{formatPrice(property.priceNumeric, property.status, property.priceFrequency)}</span>
+          {property.beds ? <span><BedIcon /> {property.beds} bed</span> : null}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ArrowIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">

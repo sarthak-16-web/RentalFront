@@ -282,6 +282,7 @@ grid-template-columns:1fr;
 
 .rk-ptile{
     display:block;
+    cursor:pointer;
     background:#fff;
     border-radius:22px;
     overflow:hidden;

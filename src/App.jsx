@@ -3,11 +3,13 @@ import "./App.css";
 import "./styles/variable.css";
 
 import { AdminAuthProvider } from "./context/AdminAuthContext";
+import { QuickViewProvider } from "./context/QuickViewContext";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import AppPreloader from "./components/AppPreloader";
+import PropertyQuickView from "./components/PropertyQuickView";
 // Components
 import Navbar from "./pages/Navbar";
-import Fotter from "./pages/Fotter";
+import Footer from "./pages/Footer";
 import ScrollToTop from "./components/Scrolltop";
 
 // Public Pages
@@ -33,7 +35,9 @@ function App() {
     <BrowserRouter>
     <AppPreloader />
       <AdminAuthProvider>
+      <QuickViewProvider>
         <ScrollToTop />
+        <PropertyQuickView />
 
         <Routes>
           {/* ================= PUBLIC WEBSITE ================= */}
@@ -47,7 +51,7 @@ function App() {
                 <PropertiesHome />
                 <PartnersMarquee />
                 <TestimonialsHome />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -58,7 +62,7 @@ function App() {
               <>
                 <Navbar />
                 <Properties />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -69,7 +73,7 @@ function App() {
               <>
                 <Navbar />
                 <PropertyDetails />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -80,7 +84,7 @@ function App() {
               <>
                 <Navbar />
                 <Testimonials />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -91,7 +95,7 @@ function App() {
               <>
                 <Navbar />
                 <ContactUs />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -102,7 +106,7 @@ function App() {
               <>
                 <Navbar />
                 <Collaboration />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -113,7 +117,7 @@ function App() {
               <>
                 <Navbar />
                 <TeamMemberDetails />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -124,7 +128,7 @@ function App() {
               <>
                 <Navbar />
                 <UpcomingProjects />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -135,7 +139,7 @@ function App() {
               <>
                 <Navbar />
                 <Legalpage />
-                <Fotter />
+                <Footer />
               </>
             }
           />
@@ -153,6 +157,7 @@ function App() {
             }
           />
         </Routes>
+      </QuickViewProvider>
       </AdminAuthProvider>
     </BrowserRouter>
   );

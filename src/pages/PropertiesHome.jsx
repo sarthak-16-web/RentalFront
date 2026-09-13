@@ -6,6 +6,7 @@ import "./PropertiesHome.css";
 import { Link } from "react-router-dom";
 import { useProperties, usePropertySchema } from "../hooks/useRentalKingData";
 import { useContacts } from "../hooks/useContacts";
+import { useQuickView } from "../hooks/useQuickView";
 import { contactLinks } from "../lib/contactLinks";
 import { formatPrice } from "../lib/priceFormat";
 
@@ -69,25 +70,34 @@ const ArrowIcon = () => (
 //   },
 // ];
 
-const PropertyTile = ({ p }) => (
-  <Link to={`/properties/${p._id}`} className="rk-ptile">
-    <div className="rk-ptile__media">
-      <span className="heart">♡</span>
-      <img
-  src={p.coverImage || "https://placehold.co/600x400?text=No+Image"}
-  alt={p.name}
-  loading="lazy"
-/>
-    </div>
-    <div className="rk-ptile__caption">
-      <div>
-        <h4>{p.name}</h4>
-        <span>{p.location}</span>
+const PropertyTile = ({ p }) => {
+  const { open } = useQuickView();
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => open(p)}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open(p)}
+      className="rk-ptile"
+    >
+      <div className="rk-ptile__media">
+        <span className="heart">♡</span>
+        <img
+          src={p.coverImage || "https://placehold.co/600x400?text=No+Image"}
+          alt={p.name}
+          loading="lazy"
+        />
       </div>
-      <strong>{formatPrice(p.priceNumeric, p.status, p.priceFrequency)}</strong>
+      <div className="rk-ptile__caption">
+        <div>
+          <h4>{p.name}</h4>
+          <span>{p.location}</span>
+        </div>
+        <strong>{formatPrice(p.priceNumeric, p.status, p.priceFrequency)}</strong>
+      </div>
     </div>
-  </Link>
-);
+  );
+};
 
 const PropertiesHome = () => {
   const [activeTag, setActiveTag] = useState("All");
@@ -264,7 +274,7 @@ if (isError) {
           <Reveal direction="up" delay={120}>
             <div className="rk-prop__more">
               <Link
-  to="/properties?featured=1"
+  to="/properties"
   className="rk-hero__cta-ghost rk-prop__more-btn"
 >
   View All Properties <ArrowIcon />
