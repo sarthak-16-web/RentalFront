@@ -1,32 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import PropertyCard from "../components/PropertyCard";
 import "./Properties.css";
 import { useProperties } from "../hooks/useRentalKingData";
 const CATEGORIES = ["Apartment", "Villa", "House", "Plot", "Commercial" , "Warehouse" , "Flats"];
-const STATUSES = ["For Rent", "For Sale", "Co Working", "Pre Leased"];
-const FURNISHING_OPTIONS = ["Furnished", "Semi Furnished", "Unfurnished"];
 
 const SCROLL_KEY = "rk-properties-scroll";
 
-// "3 BHK" -> 3, "3" -> 3, "" -> ""
-const parseBeds = (val) => {
-  if (!val) return "";
-  const n = parseInt(val, 10);
-  return Number.isNaN(n) ? "" : n;
-};
-
 const Properties = () => {
-  const [searchParams] = useSearchParams();
-
-  const [category, setCategory] = useState(searchParams.get("category") || "");
-  const [location, setLocation] = useState(searchParams.get("location") || "");
-  const [minBeds, setMinBeds] = useState(parseBeds(searchParams.get("beds")));
-  const [minPrice, setMinPrice] = useState(searchParams.get("priceMin") || "");
-  const [maxPrice, setMaxPrice] = useState(searchParams.get("priceMax") || "");
-  const [status, setStatus] = useState(searchParams.get("status") || "");
-  const [furnishing, setFurnishing] = useState(searchParams.get("furnishing") || "");
-
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState("");
+  const [minBeds, setMinBeds] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
    const {
   data: properties = [],
   isLoading,
@@ -44,11 +29,9 @@ const Properties = () => {
       if (minBeds && (!p.beds || p.beds < Number(minBeds))) return false;
       if (minPrice && p.priceNumeric < Number(minPrice)) return false;
       if (maxPrice && p.priceNumeric > Number(maxPrice)) return false;
-      if (status && p.status !== status) return false;
-      if (furnishing && p.furnishing !== furnishing) return false;
       return true;
     });
-  }, [properties, category, location, minBeds, minPrice, maxPrice, status, furnishing]);
+  }, [category, location, minBeds, minPrice, maxPrice]);
 
   const resetFilters = () => {
     setCategory("");
@@ -56,12 +39,9 @@ const Properties = () => {
     setMinBeds("");
     setMinPrice("");
     setMaxPrice("");
-    setStatus("");
-    setFurnishing("");
   };
 
-  const hasActiveFilters =
-    category || location || minBeds || minPrice || maxPrice || status || furnishing;
+  const hasActiveFilters = category || location || minBeds || minPrice || maxPrice;
 
   // Keep track of scroll position while the user browses this page.
   useEffect(() => {
@@ -110,20 +90,6 @@ const Properties = () => {
               <option value="">All Locations</option>
               {locations.map((l) => (
                 <option key={l} value={l}>{l}</option>
-              ))}
-            </select>
-
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="">All Status</option>
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-
-            <select value={furnishing} onChange={(e) => setFurnishing(e.target.value)}>
-              <option value="">All Furnishing</option>
-              {FURNISHING_OPTIONS.map((f) => (
-                <option key={f} value={f}>{f}</option>
               ))}
             </select>
 
