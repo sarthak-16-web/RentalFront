@@ -6,9 +6,10 @@ import {
   deleteProject,
   getProjectSchema,
 } from "../api/adminResourceApi";
+import AssetPicker from "../components/AssetPicker";
 import "./AdminManager.css";
 
-const emptyForm = { name: "", categories: [], images: "", description: "" };
+const emptyForm = { name: "", categories: [], images: [], description: "" };
 
 const ProjectsManager = () => {
   const [projects, setProjects] = useState([]);
@@ -51,7 +52,7 @@ const ProjectsManager = () => {
     setForm({
       name: p.name || "",
       categories: p.categories || [],
-      images: (p.images || []).join(", "),
+      images: p.images || [],
       description: p.description || "",
     });
     setEditingId(p._id);
@@ -75,20 +76,20 @@ const ProjectsManager = () => {
       setError("Select at least one category.");
       return;
     }
+    if (form.images.length === 0) {
+      setError("Choose at least one image.");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess("");
-    const payload = {
-      ...form,
-      images: form.images.split(",").map((s) => s.trim()).filter(Boolean),
-    };
 
     try {
       if (editingId) {
-        await editProject(editingId, payload);
+        await editProject(editingId, form);
         setSuccess("Project updated successfully.");
       } else {
-        await addProject(payload);
+        await addProject(form);
         setSuccess("Project added successfully.");
       }
       setShowForm(false);
@@ -147,8 +148,12 @@ const ProjectsManager = () => {
           </div>
 
           <div className="rk-amgr__field">
-            <label>Images (comma-separated URLs)</label>
-            <input name="images" required value={form.images} onChange={handleChange} />
+            <label>Images</label>
+            <AssetPicker
+              value={form.images}
+              onChange={(urls) => setForm((f) => ({ ...f, images: urls }))}
+              multiple
+            />
           </div>
 
           <div className="rk-amgr__field">

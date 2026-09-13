@@ -5,6 +5,7 @@ import {
   editPartner,
   deletePartner,
 } from "../api/adminResourceApi";
+import AssetPicker from "../components/AssetPicker";
 import "./AdminManager.css";
 
 const emptyForm = { name: "", logo: "" };
@@ -55,6 +56,10 @@ const PartnersManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.logo) {
+      setError("Choose a logo.");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess("");
@@ -148,8 +153,11 @@ const PartnersManager = () => {
           </div>
 
           <div className="rk-amgr__field">
-            <label>Logo URL</label>
-            <input name="logo" required value={form.logo} onChange={handleChange} />
+            <label>Logo</label>
+            <AssetPicker
+              value={form.logo}
+              onChange={(url) => setForm((f) => ({ ...f, logo: url }))}
+            />
           </div>
 
           <div className="rk-amgr__actions">

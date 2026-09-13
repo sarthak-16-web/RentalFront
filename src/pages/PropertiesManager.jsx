@@ -7,6 +7,7 @@ import {
   getPropertySchema,
 } from "../api/adminResourceApi";
 import { formatPrice } from "../lib/priceFormat";
+import AssetPicker from "../components/AssetPicker";
 import "./AdminManager.css";
 
 const emptySchema = {
@@ -30,7 +31,7 @@ const baseForm = {
   furnishing: "",
   bhk: "",
   coverImage: "",
-  images: "",
+  images: [],
   beds: "",
   baths: "",
   sqft: "",
@@ -143,7 +144,7 @@ const PropertiesManager = () => {
       category,
       ...dependent,
       coverImage: p.coverImage || "",
-      images: (p.images || []).join(", "),
+      images: p.images || [],
       beds: repairBeds(schema, dependent.bhk, p.beds ?? ""),
       baths: p.baths ?? "",
       sqft: p.sqft || "",
@@ -178,6 +179,10 @@ const PropertiesManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.coverImage) {
+      setError("Choose a cover image.");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess("");
@@ -194,9 +199,6 @@ const PropertiesManager = () => {
       priceFrequency: form.priceFrequency || null,
       beds: form.beds ? Number(form.beds) : null,
       baths: form.baths ? Number(form.baths) : null,
-      images: form.images
-        ? form.images.split(",").map((s) => s.trim()).filter(Boolean)
-        : [],
     };
 
     try {
@@ -338,13 +340,20 @@ const PropertiesManager = () => {
           </div>
 
           <div className="rk-amgr__field">
-            <label>Cover Image URL</label>
-            <input name="coverImage" required value={form.coverImage} onChange={handleChange} />
+            <label>Cover Image</label>
+            <AssetPicker
+              value={form.coverImage}
+              onChange={(url) => setForm((f) => ({ ...f, coverImage: url }))}
+            />
           </div>
 
           <div className="rk-amgr__field">
-            <label>Additional Images (comma-separated URLs)</label>
-            <input name="images" value={form.images} onChange={handleChange} />
+            <label>Additional Images</label>
+            <AssetPicker
+              value={form.images}
+              onChange={(urls) => setForm((f) => ({ ...f, images: urls }))}
+              multiple
+            />
           </div>
 
           <div className="rk-amgr__row rk-amgr__row--3">

@@ -7,6 +7,7 @@ import TestimonialsManager from "./TestimonialsManager";
 import ContactSettings from "./ContactSettings";
 import TeamManager from "./TeamManager";
 import PartnersManager from "./PartnersManager";
+import AssetsManager from "./AssetsManager";
 import { Link } from "react-router-dom";
 import "./AdminDashboard.css";
 
@@ -17,6 +18,7 @@ const TABS = [
   { key: "contacts", label: "Contact Details" },
   { key: "team", label: "Team" },
   { key: "partners", label: "Channel Partners" },
+  { key: "assets", label: "Assets" },
 ];
 
 const AdminDashboard = () => {
@@ -62,6 +64,7 @@ const AdminDashboard = () => {
         {activeTab === "contacts" && <ContactSettings />}
         {activeTab === "team" && <TeamManager />}
         {activeTab === "partners" && <PartnersManager />}
+        {activeTab === "assets" && <AssetsManager />}
       </main>
     </div>
   );

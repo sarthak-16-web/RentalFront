@@ -80,6 +80,23 @@ export const deletePartner = async (id) => {
   return res.data;
 };
 
+/* Assets */
+export const getAllAssets = async () => {
+  const res = await api.get("/asset/get-all");
+  return res.data.assets;
+};
+export const uploadAsset = async (name, file) => {
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("image", file);
+  const res = await api.post("/asset/upload", formData);
+  return res.data;
+};
+export const deleteAsset = async (id) => {
+  const res = await api.delete(`/asset/delete/${id}`);
+  return res.data;
+};
+
 /* Testimonials */
 export const getAllTestimonials = async () => {
   const res = await api.get("/testimonial/get-all");

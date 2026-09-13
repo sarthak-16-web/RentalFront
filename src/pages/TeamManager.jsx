@@ -6,6 +6,7 @@ import {
   editTeamMember,
   deleteTeamMember,
 } from "../api/adminResourceApi";
+import AssetPicker from "../components/AssetPicker";
 import "./AdminManager.css";
 
 const emptyDirectorForm = { name: "", role: "", photo: "", message: "" };
@@ -35,6 +36,10 @@ const TeamManager = () => {
 
   const handleDirectorSubmit = async (e) => {
     e.preventDefault();
+    if (!directorForm.photo) {
+      setDirectorError("Choose a photo.");
+      return;
+    }
     setDirectorError("");
     setDirectorSuccess("");
     try {
@@ -92,6 +97,10 @@ const TeamManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.photo) {
+      setError("Choose a photo.");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess("");
@@ -194,8 +203,11 @@ const TeamManager = () => {
           </div>
 
           <div className="rk-amgr__field">
-            <label>Photo URL</label>
-            <input name="photo" required value={directorForm.photo} onChange={handleDirectorChange} />
+            <label>Photo</label>
+            <AssetPicker
+              value={directorForm.photo}
+              onChange={(url) => setDirectorForm((f) => ({ ...f, photo: url }))}
+            />
           </div>
 
           <div className="rk-amgr__field">
@@ -241,8 +253,11 @@ const TeamManager = () => {
           </div>
 
           <div className="rk-amgr__field">
-            <label>Photo URL</label>
-            <input name="photo" required value={form.photo} onChange={handleChange} />
+            <label>Photo</label>
+            <AssetPicker
+              value={form.photo}
+              onChange={(url) => setForm((f) => ({ ...f, photo: url }))}
+            />
           </div>
 
           <div className="rk-amgr__field">
