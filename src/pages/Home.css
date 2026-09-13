@@ -327,3 +327,40 @@
   border-radius: 999px;
   white-space: nowrap;
 }
+
+.rk-prow__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.rk-prow__action {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.rk-prow__action:hover {
+  transform: translateY(-2px);
+}
+
+.rk-prow__action--gold {
+  background: var(--color-gold-500);
+  color: #fff;
+}
+
+.rk-prow__action--whatsapp {
+  background: #25d366;
+  color: #fff;
+}
+
+.rk-prow__action--call {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--color-white);
+}
