@@ -14,8 +14,3 @@ export const checkAdminSession = async () => {
   const res = await api.get("/admin/me");
   return res.data;
 };
-
-export const refreshAccessToken = async () => {
-  const res = await api.post("/admin/refresh");
-  return res.data;
-};
