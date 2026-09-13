@@ -22,9 +22,9 @@ const EXPLORE_LINKS = [
 ];
 
 const COMPANY_LINKS = [
-  { label: "Meet the Team", to: "/team" },
+  { label: "Team", to: "/team" },
+  { label: "Services", to: "/contact" },
   { label: "Collaboration", to: "/collaboration" },
-  { label: "Contact & Support", to: "/contact" },
 ];
 
 const LEGAL_LINKS = [
