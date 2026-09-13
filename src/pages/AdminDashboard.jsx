@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useAdminAuth } from "../hooks/useAdminAuth";
+import { getAllTestimonials } from "../api/adminResourceApi";
 import PropertiesManager from "./PropertiesManager";
 import ProjectsManager from "./ProjectsManager";
 import TestimonialsManager from "./TestimonialsManager";
@@ -26,6 +28,12 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
 
+  const { data: testimonials = [] } = useQuery({
+    queryKey: ["adminTestimonials"],
+    queryFn: getAllTestimonials,
+  });
+  const pendingTestimonials = testimonials.filter((t) => !t.approved).length;
+
   const handleLogout = async () => {
     await logout();
     navigate("/admin/login");
@@ -47,6 +55,9 @@ const AdminDashboard = () => {
               onClick={() => setActiveTab(t.key)}
             >
               {t.label}
+              {t.key === "testimonials" && pendingTestimonials > 0 && (
+                <span className="rk-adash__navbadge">{pendingTestimonials}</span>
+              )}
             </button>
           ))}
         </nav>
